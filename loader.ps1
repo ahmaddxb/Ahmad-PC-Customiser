@@ -1,11 +1,10 @@
 <#
 .SYNOPSIS
     Downloads a multi-file PowerShell project from GitHub, combines it into a single script,
-    and executes it in memory. This is designed to be run as a one-liner.
+    and executes it in memory. This version includes extensive logging to debug loading issues.
 #>
 
 # --- CONFIGURATION ---
-# Make sure these match your GitHub username and repository name
 $githubUser = "ahmaddxb"
 $repoName   = "Ahmad-PC-Customiser"
 $branchName = "master" # Change this to "main" if that is your repository's default branch
@@ -20,47 +19,19 @@ $zipFile  = Join-Path $tempDir "repo.zip"
 New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
 
 try {
-    # Download the entire repository as a ZIP file
+    # Download and extract the project
     Write-Host "Downloading project from GitHub..."
     Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile -UseBasicParsing
-
-    # Extract the ZIP file
     Write-Host "Extracting script files..."
     Expand-Archive -Path $zipFile -DestinationPath $tempDir -Force
-
-    # The unzipped folder will have a name like 'RepoName-main' or 'RepoName-master'. Find it.
     $unzippedFolder = Get-ChildItem -Path $tempDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
-    
-    if (-not $unzippedFolder) {
-        throw "Could not find unzipped repository folder."
-    }
-    
+    if (-not $unzippedFolder) { throw "Could not find unzipped repository folder." }
     $projectRoot = $unzippedFolder.FullName
     Write-Host "Project extracted to: $projectRoot"
 
     # --- SCRIPT COMBINER LOGIC ---
-    # Define the files in logical groups to ensure correct loading order.
-    $configFiles = @(
-        "config/RemoveApps.config.ps1",
-        "config/WindowsTweaks.config.ps1",
-        "config/InstallApps.config.ps1"
-    )
-    $functionFiles = @(
-        "functions/App-Removal.functions.ps1",
-        "functions/Tweak-Checks.functions.ps1",
-        "functions/Backup.functions.ps1",
-        "functions/App-Install.functions.ps1"
-    )
-    $tabFiles = @(
-        "tabs/Tab.RemoveApps.ps1",
-        "tabs/Tab.WindowsTweaks.ps1",
-        "tabs/Tab.InstallApps.ps1",
-        "tabs/Tab.Backup.ps1"
-    )
-
     Write-Host "Combining script files..."
     
-    # Start with the mandatory header
     $combinedScript = @"
 #----------------------------------
 #  AUTO-GENERATED SINGLE-FILE SCRIPT
@@ -68,10 +39,11 @@ try {
 Add-Type -AssemblyName System.Windows.Forms
 "@
 
-    # Helper function to append file content to the main script string
+    # Helper function for verbose appending
     function Append-FileContent($fileRelativePath, [ref]$scriptString) {
         $filePath = Join-Path $projectRoot $fileRelativePath
         if (Test-Path $filePath) {
+            Write-Host "Appending: $fileRelativePath"
             $scriptString.Value += "`n# --- From File: $fileRelativePath ---`n"
             $scriptString.Value += (Get-Content -Path $filePath -Raw)
         } else {
@@ -79,13 +51,19 @@ Add-Type -AssemblyName System.Windows.Forms
         }
     }
 
-    # 1. Append all Configurations
-    $configFiles | ForEach-Object { Append-FileContent -fileRelativePath $_ -scriptString ([ref]$combinedScript) }
+    # 1. Append Configurations
+    Append-FileContent -fileRelativePath "config/RemoveApps.config.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "config/WindowsTweaks.config.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "config/InstallApps.config.ps1" -scriptString ([ref]$combinedScript)
 
     # 2. Append all Functions
-    $functionFiles | ForEach-Object { Append-FileContent -fileRelativePath $_ -scriptString ([ref]$combinedScript) }
+    Append-FileContent -fileRelativePath "functions/App-Removal.functions.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "functions/Tweak-Checks.functions.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "functions/Backup.functions.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "functions/App-Install.functions.ps1" -scriptString ([ref]$combinedScript)
 
     # 3. Manually add the core UI creation code BEFORE the tabs
+    Write-Host "Appending: Main Form and TabControl creation"
     $combinedScript += @"
 
 # --- Main UI Creation ---
@@ -102,9 +80,13 @@ Add-Type -AssemblyName System.Windows.Forms
 "@
 
     # 4. Append all Tab UI files
-    $tabFiles | ForEach-Object { Append-FileContent -fileRelativePath $_ -scriptString ([ref]$combinedScript) }
+    Append-FileContent -fileRelativePath "tabs/Tab.RemoveApps.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "tabs/Tab.WindowsTweaks.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "tabs/Tab.InstallApps.ps1" -scriptString ([ref]$combinedScript)
+    Append-FileContent -fileRelativePath "tabs/Tab.Backup.ps1" -scriptString ([ref]$combinedScript)
 
     # 5. Append the final execution command
+    Write-Host "Appending: Final ShowDialog() call"
     $combinedScript += @"
 
 # --- Show the Form ---
