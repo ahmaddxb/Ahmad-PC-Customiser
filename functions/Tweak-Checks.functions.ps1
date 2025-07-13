@@ -29,10 +29,10 @@ function IsTweakApplied($tweakName) {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -ErrorAction SilentlyContinue
             return ($registryValue -eq 0)
         }
-        "Hide Chat on Task Bar" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarMn" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 0)
-        }
+        # "Hide Chat on Task Bar" {
+        #     $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarMn" -ErrorAction SilentlyContinue
+        #     return ($registryValue -eq 0)
+        # }
         "disable search web results on Windows 11" {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Name "DisableSearchBoxSuggestions" -ErrorAction SilentlyContinue
             return ($registryValue -eq 1)
