@@ -73,16 +73,4 @@ $applyButtonWindowsTweaks.Add_Click({
 })
 
 # Initial check
-# --- DEBUGGING STEP ---
-# Get the text content of the IsTweakApplied function as it exists in memory right now.
-$functionContent = Get-Content Function:\IsTweakApplied
-# Save that content to a file on your Desktop.
-$functionContent | Out-File -FilePath "$env:USERPROFILE\Desktop\DEBUG_Function_Content.txt" -Encoding utf8 -Force
-# Show a message box to alert you that the file has been created.
-[System.Windows.Forms.MessageBox]::Show(
-    "A debug file named 'DEBUG_Function_Content.txt' has been created on your Desktop. Please open it and check its contents.",
-    "Debug Info"
-)
-
-# Initial check
 RefreshCheckboxesTweaks
