@@ -6,4 +6,5 @@ $appsToInstallMapping = @{
     "Notepad++"          = "Notepad++.Notepad++"
     "Visual Studio Code" = "Microsoft.VisualStudioCode"
     "PowerToys"          = "Microsoft.PowerToys"
+    "Everything"         = "voidtools.Everything"
 }

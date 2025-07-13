@@ -3,7 +3,7 @@ function Update-InstalledAppCheckboxes_Synchronous {
         [System.Windows.Forms.Button]$checkButton,
         [System.Windows.Forms.Button]$installButton,
         [System.Windows.Forms.Label]$statusLabel,
-        [System.Windows.Forms.Form]$form
+        [System.Windows.Forms.Form]$form # Pass the main form to force UI updates
     )
 
     # --- Step 1: Disable UI and provide feedback before freezing ---
@@ -18,9 +18,8 @@ function Update-InstalledAppCheckboxes_Synchronous {
         $appName = $checkbox.Text
         $appId = $appsToInstallMapping[$appName]
         
-        # --- THIS LINE IS CORRECTED ---
-        # Added -SimpleMatch to treat the app ID as a literal string, not a regex.
-        $isInstalled = winget list --id $appId --accept-source-agreements | Select-String -Pattern $appId -SimpleMatch -Quiet
+        # This command runs slowly for each app, causing the freeze.
+        $isInstalled = winget list --id $appId --accept-source-agreements | Select-String -Pattern $appId -Quiet
         
         $checkbox.Checked = $isInstalled
     }
