@@ -41,10 +41,10 @@ function IsTweakApplied($tweakName) {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" -Name "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" -ErrorAction SilentlyContinue
             return ($null -ne $registryValue -and $registryValue -eq 0)
         }
-        "Turn on Use Print Screen Key to Open Screen Snipping" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Keyboard" -Name "PrintScreenKeyForSnippingEnabled" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
+        # "Turn on Use Print Screen Key to Open Screen Snipping" {
+        #     $registryValue = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Keyboard" -Name "PrintScreenKeyForSnippingEnabled" -ErrorAction SilentlyContinue
+        #     return ($registryValue -eq 1)
+        # }
         "Turn On Set Time Zone Automatically" {
             $registryValue = Get-ItemPropertyValue -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -Name "Start" -ErrorAction SilentlyContinue
             return ($registryValue -eq 3)
