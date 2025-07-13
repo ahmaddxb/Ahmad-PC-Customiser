@@ -4,8 +4,8 @@ $githubUser = "ahmaddxb"
 $repoName   = "Ahmad-PC-Customiser"
 # --- END CONFIGURATION ---
 
-# Define URLs and temporary paths
-$zipUrl   = "https://github.com/$githubUser/$repoName/archive/refs/heads/main.zip"
+# Define URLs and temporary paths. This now points to MASTER.
+$zipUrl   = "https://github.com/$githubUser/$repoName/archive/refs/heads/master.zip"
 $tempDir  = Join-Path $env:TEMP ([System.Guid]::NewGuid().ToString())
 $zipFile  = Join-Path $tempDir "repo.zip"
 
@@ -21,7 +21,7 @@ try {
     Write-Host "Extracting script files..."
     Expand-Archive -Path $zipFile -DestinationPath $tempDir -Force
 
-    # The unzipped folder will have a name like 'RepoName-main'. Find it.
+    # The unzipped folder will have a name like 'RepoName-master'. Find it.
     $unzippedFolder = Get-ChildItem -Path $tempDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
     
     if (-not $unzippedFolder) {
