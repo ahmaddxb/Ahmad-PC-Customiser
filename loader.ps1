@@ -1,7 +1,7 @@
 # --- CONFIGURATION ---
 # Make sure these match your GitHub username and repository name
 $githubUser = "ahmaddxb"
-$repoName   = "Ahmadd-PC-Customiser"
+$repoName   = "Ahmad-PC-Customiser"
 # --- END CONFIGURATION ---
 
 # Define URLs and temporary paths
