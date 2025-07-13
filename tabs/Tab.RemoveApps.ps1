@@ -1,23 +1,28 @@
 $tabRemoveApps = New-Object System.Windows.Forms.TabPage
 $tabRemoveApps.Text = "Remove Apps"
+$tabRemoveApps.BackColor = $theme.Background
 $tabControl.Controls.Add($tabRemoveApps)
 
 # --- 1. Create a Panel for the Buttons (at the bottom) ---
 $actionPanel = New-Object System.Windows.Forms.Panel
 $actionPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
 $actionPanel.Height = 50
+$actionPanel.BackColor = $theme.Background
 $tabRemoveApps.Controls.Add($actionPanel)
 
 # --- 2. Create a Panel for the Content (fills the rest of the space) ---
 $contentPanel = New-Object System.Windows.Forms.Panel
 $contentPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
 $contentPanel.AutoScroll = $true # This panel will handle scrolling
+$contentPanel.BackColor = $theme.Background
 $tabRemoveApps.Controls.Add($contentPanel)
 
 # --- 3. Create a GroupBox to contain the app list ---
 $appsGroupBox = New-Object System.Windows.Forms.GroupBox
 $appsGroupBox.Location = [System.Drawing.Point]::new(10, 10)
 $appsGroupBox.Text = "UWP App Management"
+$appsGroupBox.ForeColor = $theme.Foreground
+$appsGroupBox.Font = $theme.Font
 $contentPanel.Controls.Add($appsGroupBox)
 
 # --- 4. Add Content to the GroupBox ---
@@ -28,6 +33,7 @@ $selectAllCheckbox.Location = [System.Drawing.Point]::new(20, 30) #<-- Moved lef
 $selectAllCheckbox.Size = New-Object System.Drawing.Size(300, 20)
 $selectAllCheckbox.Text = "Select All"
 $selectAllCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold)
+$selectAllCheckbox.ForeColor = $theme.Foreground
 $appsGroupBox.Controls.Add($selectAllCheckbox)
 
 $checkboxes = @()
@@ -38,6 +44,8 @@ foreach ($packageName in $packageMappings.Keys) {
     $checkbox.Location = [System.Drawing.Point]::new(20, $y) #<-- Moved left
     $checkbox.Size = New-Object System.Drawing.Size(380, 20)
     $checkbox.Text = $friendlyName
+    $checkbox.ForeColor = $theme.Foreground
+    $checkbox.Font = $theme.Font
     $appsGroupBox.Controls.Add($checkbox)
     $checkboxes += @{ Name = $packageName; Checkbox = $checkbox }
     $y += 22 # Use tighter spacing
@@ -51,12 +59,18 @@ $removeButton = New-Object System.Windows.Forms.Button
 $removeButton.Location = [System.Drawing.Point]::new(310, 10)
 $removeButton.Size = New-Object System.Drawing.Size(100, 30)
 $removeButton.Text = "Remove"
+$removeButton.BackColor = $theme.Accent
+$removeButton.ForeColor = $theme.Foreground
+$removeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $actionPanel.Controls.Add($removeButton)
 
 $refreshButton = New-Object System.Windows.Forms.Button
 $refreshButton.Location = [System.Drawing.Point]::new(200, 10)
 $refreshButton.Size = New-Object System.Drawing.Size(100, 30)
 $refreshButton.Text = "Refresh"
+$refreshButton.BackColor = $theme.Control
+$refreshButton.ForeColor = $theme.Foreground
+$refreshButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $actionPanel.Controls.Add($refreshButton)
 
 # --- 6. Button Click Logic ---

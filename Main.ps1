@@ -27,17 +27,31 @@ $TabsPath = Join-Path -Path $PSScriptRoot -ChildPath "tabs"
 . (Join-Path -Path $FunctionsPath -ChildPath "Backup.functions.ps1")
 . (Join-Path -Path $FunctionsPath -ChildPath "App-Install.functions.ps1")
 
+# --- Define Theme ---
+$theme = @{
+    "Background" = [System.Drawing.Color]::FromArgb(45, 45, 48)
+    "Foreground" = [System.Drawing.Color]::FromArgb(255, 255, 255)
+    "Accent"     = [System.Drawing.Color]::FromArgb(0, 122, 204)
+    "Control"    = [System.Drawing.Color]::FromArgb(63, 63, 70)
+    "Font"       = New-Object System.Drawing.Font("Segoe UI", 9)
+}
+
 # --- Create the Main Form and Controls ---
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Ahmaddxb Windows Customiser"
 $form.Size = New-Object System.Drawing.Size(480, 680)
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "Sizable"
-$form.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+$form.Font = $theme.Font
+$form.BackColor = $theme.Background
+$form.ForeColor = $theme.Foreground
 
 # --- CORRECTED: The TabControl is now the main control and docks to fill the form ---
 $tabControl = New-Object System.Windows.Forms.TabControl
 $tabControl.Dock = [System.Windows.Forms.DockStyle]::Fill
+$tabControl.Font = $theme.Font
+$tabControl.BackColor = $theme.Background
+$tabControl.ForeColor = $theme.Foreground
 $form.Controls.Add($tabControl)
 
 # --- Dot-Source the UI for Each Tab ---

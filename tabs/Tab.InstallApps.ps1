@@ -1,19 +1,23 @@
 $tabInstallApps = New-Object System.Windows.Forms.TabPage
 $tabInstallApps.Text = "Install Apps"
+$tabInstallApps.BackColor = $theme.Background
 $tabControl.Controls.Add($tabInstallApps)
 
 # --- 1. Create the three main panels for the layout ---
 $buttonPanel = New-Object System.Windows.Forms.Panel
 $buttonPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
 $buttonPanel.Height = 50 # Slim panel just for buttons
+$buttonPanel.BackColor = $theme.Background
 
 $logPanel = New-Object System.Windows.Forms.Panel
 $logPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
 $logPanel.Height = 170 # Panel for the log box and status
+$logPanel.BackColor = $theme.Background
 
 $contentPanel = New-Object System.Windows.Forms.Panel
 $contentPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
 $contentPanel.AutoScroll = $true # Panel for the scrolling checkboxes
+$contentPanel.BackColor = $theme.Background
 
 # --- 2. Add panels to the tab. Order matters for docking. ---
 $tabInstallApps.Controls.Add($contentPanel)
@@ -24,6 +28,8 @@ $tabInstallApps.Controls.Add($buttonPanel)
 $appsGroupBox = New-Object System.Windows.Forms.GroupBox
 $appsGroupBox.Location = [System.Drawing.Point]::new(10, 10)
 $appsGroupBox.Text = "Available Applications"
+$appsGroupBox.ForeColor = $theme.Foreground
+$appsGroupBox.Font = $theme.Font
 $contentPanel.Controls.Add($appsGroupBox)
 
 $checkboxesInstallApps = @()
@@ -33,6 +39,8 @@ foreach ($appName in $appsToInstallMapping.Keys) {
     $checkbox.Location = [System.Drawing.Point]::new(20, $yInstall)
     $checkbox.Size = New-Object System.Drawing.Size(380, 20)
     $checkbox.Text = $appName
+    $checkbox.ForeColor = $theme.Foreground
+    $checkbox.Font = $theme.Font
     $appsGroupBox.Controls.Add($checkbox)
     $checkboxesInstallApps += $checkbox
     $yInstall += 22
@@ -47,11 +55,17 @@ $checkInstalledButton = New-Object System.Windows.Forms.Button
 $checkInstalledButton.Location = [System.Drawing.Point]::new(210, 10)
 $checkInstalledButton.Size = New-Object System.Drawing.Size(120, 30)
 $checkInstalledButton.Text = "Check Installed"
+$checkInstalledButton.BackColor = $theme.Control
+$checkInstalledButton.ForeColor = $theme.Foreground
+$checkInstalledButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $buttonPanel.Controls.Add($checkInstalledButton)
 
 $installButton.Location = [System.Drawing.Point]::new(340, 10)
 $installButton.Size = New-Object System.Drawing.Size(100, 30)
 $installButton.Text = "Install"
+$installButton.BackColor = $theme.Accent
+$installButton.ForeColor = $theme.Foreground
+$installButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $buttonPanel.Controls.Add($installButton)
 
 # --- 5. Create and add controls to the LOG panel ---
@@ -64,12 +78,15 @@ $installLogBox.MultiLine = $true
 $installLogBox.ScrollBars = 'Vertical'
 $installLogBox.ReadOnly = $true
 $installLogBox.Font = New-Object System.Drawing.Font("Consolas", 9)
+$installLogBox.BackColor = $theme.Control
+$installLogBox.ForeColor = $theme.Foreground
 $installLogBox.Visible = $false
 $logPanel.Controls.Add($installLogBox)
 
 $installStatusLabel.Location = [System.Drawing.Point]::new(10, 140)
 $installStatusLabel.Size = New-Object System.Drawing.Size(435, 20)
 $installStatusLabel.Text = ""
+$installStatusLabel.ForeColor = $theme.Foreground
 $logPanel.Controls.Add($installStatusLabel)
 
 # --- 6. Button Click Logic ---

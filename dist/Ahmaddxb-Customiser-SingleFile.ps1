@@ -367,24 +367,29 @@ $tabControl = New-Object System.Windows.Forms.TabControl; $tabControl.Dock = [Sy
 # --- From File: tabs/Tab.RemoveApps.ps1 ---
 $tabRemoveApps = New-Object System.Windows.Forms.TabPage
 $tabRemoveApps.Text = "Remove Apps"
+$tabRemoveApps.BackColor = $theme.Background
 $tabControl.Controls.Add($tabRemoveApps)
 
 # --- 1. Create a Panel for the Buttons (at the bottom) ---
 $actionPanel = New-Object System.Windows.Forms.Panel
 $actionPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
 $actionPanel.Height = 50
+$actionPanel.BackColor = $theme.Background
 $tabRemoveApps.Controls.Add($actionPanel)
 
 # --- 2. Create a Panel for the Content (fills the rest of the space) ---
 $contentPanel = New-Object System.Windows.Forms.Panel
 $contentPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
 $contentPanel.AutoScroll = $true # This panel will handle scrolling
+$contentPanel.BackColor = $theme.Background
 $tabRemoveApps.Controls.Add($contentPanel)
 
 # --- 3. Create a GroupBox to contain the app list ---
 $appsGroupBox = New-Object System.Windows.Forms.GroupBox
 $appsGroupBox.Location = [System.Drawing.Point]::new(10, 10)
 $appsGroupBox.Text = "UWP App Management"
+$appsGroupBox.ForeColor = $theme.Foreground
+$appsGroupBox.Font = $theme.Font
 $contentPanel.Controls.Add($appsGroupBox)
 
 # --- 4. Add Content to the GroupBox ---
@@ -395,6 +400,7 @@ $selectAllCheckbox.Location = [System.Drawing.Point]::new(20, 30) #<-- Moved lef
 $selectAllCheckbox.Size = New-Object System.Drawing.Size(300, 20)
 $selectAllCheckbox.Text = "Select All"
 $selectAllCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold)
+$selectAllCheckbox.ForeColor = $theme.Foreground
 $appsGroupBox.Controls.Add($selectAllCheckbox)
 
 $checkboxes = @()
@@ -405,6 +411,8 @@ foreach ($packageName in $packageMappings.Keys) {
     $checkbox.Location = [System.Drawing.Point]::new(20, $y) #<-- Moved left
     $checkbox.Size = New-Object System.Drawing.Size(380, 20)
     $checkbox.Text = $friendlyName
+    $checkbox.ForeColor = $theme.Foreground
+    $checkbox.Font = $theme.Font
     $appsGroupBox.Controls.Add($checkbox)
     $checkboxes += @{ Name = $packageName; Checkbox = $checkbox }
     $y += 22 # Use tighter spacing
@@ -418,12 +426,18 @@ $removeButton = New-Object System.Windows.Forms.Button
 $removeButton.Location = [System.Drawing.Point]::new(310, 10)
 $removeButton.Size = New-Object System.Drawing.Size(100, 30)
 $removeButton.Text = "Remove"
+$removeButton.BackColor = $theme.Accent
+$removeButton.ForeColor = $theme.Foreground
+$removeButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $actionPanel.Controls.Add($removeButton)
 
 $refreshButton = New-Object System.Windows.Forms.Button
 $refreshButton.Location = [System.Drawing.Point]::new(200, 10)
 $refreshButton.Size = New-Object System.Drawing.Size(100, 30)
 $refreshButton.Text = "Refresh"
+$refreshButton.BackColor = $theme.Control
+$refreshButton.ForeColor = $theme.Foreground
+$refreshButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $actionPanel.Controls.Add($refreshButton)
 
 # --- 6. Button Click Logic ---
@@ -467,24 +481,29 @@ RefreshCheckboxesRemoveApp
 # --- From File: tabs/Tab.WindowsTweaks.ps1 ---
 $tabWindowsTweaks = New-Object System.Windows.Forms.TabPage
 $tabWindowsTweaks.Text = "Windows Tweaks"
+$tabWindowsTweaks.BackColor = $theme.Background
 $tabControl.Controls.Add($tabWindowsTweaks)
 
 # --- 1. Create a Panel for the Buttons (at the bottom) ---
 $tweaksActionPanel = New-Object System.Windows.Forms.Panel
 $tweaksActionPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
 $tweaksActionPanel.Height = 50
+$tweaksActionPanel.BackColor = $theme.Background
 $tabWindowsTweaks.Controls.Add($tweaksActionPanel)
 
 # --- 2. Create a Panel for the Content (fills the rest of the space) ---
 $tweaksContentPanel = New-Object System.Windows.Forms.Panel
 $tweaksContentPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
 $tweaksContentPanel.AutoScroll = $true # This panel will handle scrolling
+$tweaksContentPanel.BackColor = $theme.Background
 $tabWindowsTweaks.Controls.Add($tweaksContentPanel)
 
 # --- 3. Create a GroupBox to contain the tweaks ---
 $tweaksGroupBox = New-Object System.Windows.Forms.GroupBox
 $tweaksGroupBox.Location = [System.Drawing.Point]::new(10, 10)
 $tweaksGroupBox.Text = "System & Explorer Tweaks"
+$tweaksGroupBox.ForeColor = $theme.Foreground
+$tweaksGroupBox.Font = $theme.Font
 $tweaksContentPanel.Controls.Add($tweaksGroupBox)
 
 # --- 4. Add Content to the GroupBox ---
@@ -495,6 +514,8 @@ foreach ($tweakName in $windowsTweaksMapping.Keys) {
     $checkbox.Text = $tweakName
     $checkbox.Location = [System.Drawing.Point]::new(20, $yPos) # Moved left
     $checkbox.Width = 410 # Keep width to prevent text cutoff
+    $checkbox.ForeColor = $theme.Foreground
+    $checkbox.Font = $theme.Font
     $tweaksGroupBox.Controls.Add($checkbox)
     $checkboxesWindowsTweaks += $checkbox
     $yPos += 22 # Use tight spacing
@@ -509,18 +530,27 @@ $refreshButtonWindowsTweaks = New-Object System.Windows.Forms.Button
 $refreshButtonWindowsTweaks.Text = "Refresh"
 $refreshButtonWindowsTweaks.Location = [System.Drawing.Point]::new(200, 10)
 $refreshButtonWindowsTweaks.Size = New-Object System.Drawing.Size(100, 30)
+$refreshButtonWindowsTweaks.BackColor = $theme.Control
+$refreshButtonWindowsTweaks.ForeColor = $theme.Foreground
+$refreshButtonWindowsTweaks.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $tweaksActionPanel.Controls.Add($refreshButtonWindowsTweaks)
 
 $clearButtonWindowsTweaks = New-Object System.Windows.Forms.Button
 $clearButtonWindowsTweaks.Text = "Clear Checks"
 $clearButtonWindowsTweaks.Location = [System.Drawing.Point]::new(90, 10)
 $clearButtonWindowsTweaks.Size = New-Object System.Drawing.Size(100, 30)
+$clearButtonWindowsTweaks.BackColor = $theme.Control
+$clearButtonWindowsTweaks.ForeColor = $theme.Foreground
+$clearButtonWindowsTweaks.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $tweaksActionPanel.Controls.Add($clearButtonWindowsTweaks)
 
 $applyButtonWindowsTweaks = New-Object System.Windows.Forms.Button
 $applyButtonWindowsTweaks.Location = [System.Drawing.Point]::new(310, 10)
 $applyButtonWindowsTweaks.Size = New-Object System.Drawing.Size(100, 30)
 $applyButtonWindowsTweaks.Text = "Apply"
+$applyButtonWindowsTweaks.BackColor = $theme.Accent
+$applyButtonWindowsTweaks.ForeColor = $theme.Foreground
+$applyButtonWindowsTweaks.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $tweaksActionPanel.Controls.Add($applyButtonWindowsTweaks)
 
 # --- 6. Button Click Logic ---
@@ -560,20 +590,24 @@ RefreshCheckboxesTweaks
 # --- From File: tabs/Tab.InstallApps.ps1 ---
 $tabInstallApps = New-Object System.Windows.Forms.TabPage
 $tabInstallApps.Text = "Install Apps"
+$tabInstallApps.BackColor = $theme.Background
 $tabControl.Controls.Add($tabInstallApps)
 
 # --- 1. Create the three main panels for the layout ---
 $buttonPanel = New-Object System.Windows.Forms.Panel
 $buttonPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
 $buttonPanel.Height = 50 # Slim panel just for buttons
+$buttonPanel.BackColor = $theme.Background
 
 $logPanel = New-Object System.Windows.Forms.Panel
 $logPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
 $logPanel.Height = 170 # Panel for the log box and status
+$logPanel.BackColor = $theme.Background
 
 $contentPanel = New-Object System.Windows.Forms.Panel
 $contentPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
 $contentPanel.AutoScroll = $true # Panel for the scrolling checkboxes
+$contentPanel.BackColor = $theme.Background
 
 # --- 2. Add panels to the tab. Order matters for docking. ---
 $tabInstallApps.Controls.Add($contentPanel)
@@ -584,6 +618,8 @@ $tabInstallApps.Controls.Add($buttonPanel)
 $appsGroupBox = New-Object System.Windows.Forms.GroupBox
 $appsGroupBox.Location = [System.Drawing.Point]::new(10, 10)
 $appsGroupBox.Text = "Available Applications"
+$appsGroupBox.ForeColor = $theme.Foreground
+$appsGroupBox.Font = $theme.Font
 $contentPanel.Controls.Add($appsGroupBox)
 
 $checkboxesInstallApps = @()
@@ -593,6 +629,8 @@ foreach ($appName in $appsToInstallMapping.Keys) {
     $checkbox.Location = [System.Drawing.Point]::new(20, $yInstall)
     $checkbox.Size = New-Object System.Drawing.Size(380, 20)
     $checkbox.Text = $appName
+    $checkbox.ForeColor = $theme.Foreground
+    $checkbox.Font = $theme.Font
     $appsGroupBox.Controls.Add($checkbox)
     $checkboxesInstallApps += $checkbox
     $yInstall += 22
@@ -607,11 +645,17 @@ $checkInstalledButton = New-Object System.Windows.Forms.Button
 $checkInstalledButton.Location = [System.Drawing.Point]::new(210, 10)
 $checkInstalledButton.Size = New-Object System.Drawing.Size(120, 30)
 $checkInstalledButton.Text = "Check Installed"
+$checkInstalledButton.BackColor = $theme.Control
+$checkInstalledButton.ForeColor = $theme.Foreground
+$checkInstalledButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $buttonPanel.Controls.Add($checkInstalledButton)
 
 $installButton.Location = [System.Drawing.Point]::new(340, 10)
 $installButton.Size = New-Object System.Drawing.Size(100, 30)
 $installButton.Text = "Install"
+$installButton.BackColor = $theme.Accent
+$installButton.ForeColor = $theme.Foreground
+$installButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
 $buttonPanel.Controls.Add($installButton)
 
 # --- 5. Create and add controls to the LOG panel ---
@@ -624,12 +668,15 @@ $installLogBox.MultiLine = $true
 $installLogBox.ScrollBars = 'Vertical'
 $installLogBox.ReadOnly = $true
 $installLogBox.Font = New-Object System.Drawing.Font("Consolas", 9)
+$installLogBox.BackColor = $theme.Control
+$installLogBox.ForeColor = $theme.Foreground
 $installLogBox.Visible = $false
 $logPanel.Controls.Add($installLogBox)
 
 $installStatusLabel.Location = [System.Drawing.Point]::new(10, 140)
 $installStatusLabel.Size = New-Object System.Drawing.Size(435, 20)
 $installStatusLabel.Text = ""
+$installStatusLabel.ForeColor = $theme.Foreground
 $logPanel.Controls.Add($installStatusLabel)
 
 # --- 6. Button Click Logic ---
@@ -670,6 +717,7 @@ $installButton.Add_Click({
 $tabBackup = New-Object System.Windows.Forms.TabPage
 $tabBackup.Text = "Backup & Restore"
 $tabBackup.AutoScroll = $true
+$tabBackup.BackColor = $theme.Background
 $tabControl.Controls.Add($tabBackup)
 
 # Define the list of items that can be backed up or restored
@@ -686,13 +734,15 @@ $backupGroupBox = New-Object System.Windows.Forms.GroupBox
 $backupGroupBox.Location = [System.Drawing.Point]::new(10, 10)
 $backupGroupBox.Size = New-Object System.Drawing.Size(425, 310) #<-- Adjusted height
 $backupGroupBox.Text = "Backup"
+$backupGroupBox.ForeColor = $theme.Foreground
+$backupGroupBox.Font = $theme.Font
 $tabBackup.Controls.Add($backupGroupBox)
 
 # --- Create Checkboxes for Backup ---
 $backupCheckboxes = @()
 $yBackup = 30
 $selectAllBackupCheckbox = New-Object System.Windows.Forms.CheckBox
-$selectAllBackupCheckbox.Location = [System.Drawing.Point]::new(20, $yBackup); $selectAllBackupCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllBackupCheckbox.Text = "Select All"; $selectAllBackupCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold); $backupGroupBox.Controls.Add($selectAllBackupCheckbox); $yBackup += 25
+$selectAllBackupCheckbox.Location = [System.Drawing.Point]::new(20, $yBackup); $selectAllBackupCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllBackupCheckbox.Text = "Select All"; $selectAllBackupCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold); $selectAllBackupCheckbox.ForeColor = $theme.Foreground; $backupGroupBox.Controls.Add($selectAllBackupCheckbox); $yBackup += 25
 
 $itemIndex = 0
 $itemsInFirstColumn = [math]::Ceiling($backupRestoreItems.Count / 2)
@@ -705,19 +755,19 @@ foreach ($item in $backupRestoreItems) {
         $xPos = 220
         $yPos = $yBackup + (($itemIndex - $itemsInFirstColumn) * 20)
     }
-    $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item
+    $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item; $checkbox.ForeColor = $theme.Foreground; $checkbox.Font = $theme.Font
     $backupGroupBox.Controls.Add($checkbox); $backupCheckboxes += $checkbox; $itemIndex++
 }
 $selectAllBackupCheckbox.Add_Click({ foreach ($cb in $backupCheckboxes) { $cb.Checked = $selectAllBackupCheckbox.Checked } })
 
 # --- Backup Destination and Button ---
 $yBackup = 180 #<-- CHANGED FROM 160
-$backupDestLabel = New-Object System.Windows.Forms.Label; $backupDestLabel.Location = [System.Drawing.Point]::new(10, $yBackup); $backupDestLabel.Size = New-Object System.Drawing.Size(400, 20); $backupDestLabel.Text = "Backup Destination:"; $backupGroupBox.Controls.Add($backupDestLabel); $yBackup += 20
-$backupPathTextBox = New-Object System.Windows.Forms.TextBox; $backupPathTextBox.Location = [System.Drawing.Point]::new(10, $yBackup); $backupPathTextBox.Size = New-Object System.Drawing.Size(320, 20); $backupPathTextBox.ReadOnly = $true; $backupGroupBox.Controls.Add($backupPathTextBox)
-$browseBackupButton = New-Object System.Windows.Forms.Button; $browseBackupButton.Location = [System.Drawing.Point]::new(340, $yBackup - 2); $browseBackupButton.Size = New-Object System.Drawing.Size(75, 25); $browseBackupButton.Text = "Browse..."; $backupGroupBox.Controls.Add($browseBackupButton); $yBackup += 30
-$backupButton = New-Object System.Windows.Forms.Button; $backupButton.Location = [System.Drawing.Point]::new(150, $yBackup); $backupButton.Size = New-Object System.Drawing.Size(120, 30); $backupButton.Text = "Start Backup"; $backupButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $backupGroupBox.Controls.Add($backupButton)
+$backupDestLabel = New-Object System.Windows.Forms.Label; $backupDestLabel.Location = [System.Drawing.Point]::new(10, $yBackup); $backupDestLabel.Size = New-Object System.Drawing.Size(400, 20); $backupDestLabel.Text = "Backup Destination:"; $backupDestLabel.ForeColor = $theme.Foreground; $backupGroupBox.Controls.Add($backupDestLabel); $yBackup += 20
+$backupPathTextBox = New-Object System.Windows.Forms.TextBox; $backupPathTextBox.Location = [System.Drawing.Point]::new(10, $yBackup); $backupPathTextBox.Size = New-Object System.Drawing.Size(320, 20); $backupPathTextBox.ReadOnly = $true; $backupPathTextBox.BackColor = $theme.Control; $backupPathTextBox.ForeColor = $theme.Foreground; $backupGroupBox.Controls.Add($backupPathTextBox)
+$browseBackupButton = New-Object System.Windows.Forms.Button; $browseBackupButton.Location = [System.Drawing.Point]::new(340, $yBackup - 2); $browseBackupButton.Size = New-Object System.Drawing.Size(75, 25); $browseBackupButton.Text = "Browse..."; $browseBackupButton.BackColor = $theme.Control; $browseBackupButton.ForeColor = $theme.Foreground; $browseBackupButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat; $backupGroupBox.Controls.Add($browseBackupButton); $yBackup += 30
+$backupButton = New-Object System.Windows.Forms.Button; $backupButton.Location = [System.Drawing.Point]::new(150, $yBackup); $backupButton.Size = New-Object System.Drawing.Size(120, 30); $backupButton.Text = "Start Backup"; $backupButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $backupButton.BackColor = $theme.Accent; $backupButton.ForeColor = $theme.Foreground; $backupButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat; $backupGroupBox.Controls.Add($backupButton)
 $backupProgressBar = New-Object System.Windows.Forms.ProgressBar; $backupProgressBar.Location = [System.Drawing.Point]::new(10, $yBackup + 40); $backupProgressBar.Size = New-Object System.Drawing.Size(405, 20); $backupGroupBox.Controls.Add($backupProgressBar)
-$backupStatusLabel = New-Object System.Windows.Forms.Label; $backupStatusLabel.Location = [System.Drawing.Point]::new(10, $yBackup + 65); $backupStatusLabel.AutoSize = $true; $backupStatusLabel.Text = "Select items and destination."; $backupGroupBox.Controls.Add($backupStatusLabel)
+$backupStatusLabel = New-Object System.Windows.Forms.Label; $backupStatusLabel.Location = [System.Drawing.Point]::new(10, $yBackup + 65); $backupStatusLabel.AutoSize = $true; $backupStatusLabel.Text = "Select items and destination."; $backupStatusLabel.ForeColor = $theme.Foreground; $backupGroupBox.Controls.Add($backupStatusLabel)
 
 #==================================================================
 # GroupBox for Restore
@@ -726,12 +776,14 @@ $restoreGroupBox = New-Object System.Windows.Forms.GroupBox
 $restoreGroupBox.Location = [System.Drawing.Point]::new(10, 330) #<-- Adjusted Y
 $restoreGroupBox.Size = New-Object System.Drawing.Size(425, 310) #<-- Adjusted height
 $restoreGroupBox.Text = "Restore"
+$restoreGroupBox.ForeColor = $theme.Foreground
+$restoreGroupBox.Font = $theme.Font
 $tabBackup.Controls.Add($restoreGroupBox)
 
 # --- Create Checkboxes for Restore ---
 $restoreCheckboxes = @()
 $yRestore = 30
-$selectAllRestoreCheckbox = New-Object System.Windows.Forms.CheckBox; $selectAllRestoreCheckbox.Location = [System.Drawing.Point]::new(20, $yRestore); $selectAllRestoreCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllRestoreCheckbox.Text = "Select All"; $selectAllRestoreCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold); $restoreGroupBox.Controls.Add($selectAllRestoreCheckbox); $yRestore += 25
+$selectAllRestoreCheckbox = New-Object System.Windows.Forms.CheckBox; $selectAllRestoreCheckbox.Location = [System.Drawing.Point]::new(20, $yRestore); $selectAllRestoreCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllRestoreCheckbox.Text = "Select All"; $selectAllRestoreCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold); $selectAllRestoreCheckbox.ForeColor = $theme.Foreground; $restoreGroupBox.Controls.Add($selectAllRestoreCheckbox); $yRestore += 25
 
 $itemIndex = 0
 foreach ($item in $backupRestoreItems) {
@@ -743,19 +795,19 @@ foreach ($item in $backupRestoreItems) {
         $xPos = 220
         $yPos = $yRestore + (($itemIndex - $itemsInFirstColumn) * 20)
     }
-    $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item
+    $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item; $checkbox.ForeColor = $theme.Foreground; $checkbox.Font = $theme.Font
     $restoreGroupBox.Controls.Add($checkbox); $restoreCheckboxes += $checkbox; $itemIndex++
 }
 $selectAllRestoreCheckbox.Add_Click({ foreach ($cb in $restoreCheckboxes) { $cb.Checked = $selectAllRestoreCheckbox.Checked } })
 
 # --- Restore Source and Button ---
 $yRestore = 180 #<-- CHANGED FROM 160
-$restoreDestLabel = New-Object System.Windows.Forms.Label; $restoreDestLabel.Location = [System.Drawing.Point]::new(10, $yRestore); $restoreDestLabel.Size = New-Object System.Drawing.Size(400, 20); $restoreDestLabel.Text = "Restore From (select parent folder):"; $restoreGroupBox.Controls.Add($restoreDestLabel); $yRestore += 20
-$restorePathTextBox = New-Object System.Windows.Forms.TextBox; $restorePathTextBox.Location = [System.Drawing.Point]::new(10, $yRestore); $restorePathTextBox.Size = New-Object System.Drawing.Size(320, 20); $restorePathTextBox.ReadOnly = $true; $restoreGroupBox.Controls.Add($restorePathTextBox)
-$browseRestoreButton = New-Object System.Windows.Forms.Button; $browseRestoreButton.Location = [System.Drawing.Point]::new(340, $yRestore - 2); $browseRestoreButton.Size = New-Object System.Drawing.Size(75, 25); $browseRestoreButton.Text = "Browse..."; $restoreGroupBox.Controls.Add($browseRestoreButton); $yRestore += 30
-$restoreButton = New-Object System.Windows.Forms.Button; $restoreButton.Location = [System.Drawing.Point]::new(150, $yRestore); $restoreButton.Size = New-Object System.Drawing.Size(120, 30); $restoreButton.Text = "Start Restore"; $restoreButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $restoreGroupBox.Controls.Add($restoreButton)
+$restoreDestLabel = New-Object System.Windows.Forms.Label; $restoreDestLabel.Location = [System.Drawing.Point]::new(10, $yRestore); $restoreDestLabel.Size = New-Object System.Drawing.Size(400, 20); $restoreDestLabel.Text = "Restore From (select parent folder):"; $restoreDestLabel.ForeColor = $theme.Foreground; $restoreGroupBox.Controls.Add($restoreDestLabel); $yRestore += 20
+$restorePathTextBox = New-Object System.Windows.Forms.TextBox; $restorePathTextBox.Location = [System.Drawing.Point]::new(10, $yRestore); $restorePathTextBox.Size = New-Object System.Drawing.Size(320, 20); $restorePathTextBox.ReadOnly = $true; $restorePathTextBox.BackColor = $theme.Control; $restorePathTextBox.ForeColor = $theme.Foreground; $restoreGroupBox.Controls.Add($restorePathTextBox)
+$browseRestoreButton = New-Object System.Windows.Forms.Button; $browseRestoreButton.Location = [System.Drawing.Point]::new(340, $yRestore - 2); $browseRestoreButton.Size = New-Object System.Drawing.Size(75, 25); $browseRestoreButton.Text = "Browse..."; $browseRestoreButton.BackColor = $theme.Control; $browseRestoreButton.ForeColor = $theme.Foreground; $browseRestoreButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat; $restoreGroupBox.Controls.Add($browseRestoreButton); $yRestore += 30
+$restoreButton = New-Object System.Windows.Forms.Button; $restoreButton.Location = [System.Drawing.Point]::new(150, $yRestore); $restoreButton.Size = New-Object System.Drawing.Size(120, 30); $restoreButton.Text = "Start Restore"; $restoreButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $restoreButton.BackColor = $theme.Accent; $restoreButton.ForeColor = $theme.Foreground; $restoreButton.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat; $restoreGroupBox.Controls.Add($restoreButton)
 $restoreProgressBar = New-Object System.Windows.Forms.ProgressBar; $restoreProgressBar.Location = [System.Drawing.Point]::new(10, $yRestore + 40); $restoreProgressBar.Size = New-Object System.Drawing.Size(405, 20); $restoreGroupBox.Controls.Add($restoreProgressBar)
-$restoreStatusLabel = New-Object System.Windows.Forms.Label; $restoreStatusLabel.Location = [System.Drawing.Point]::new(10, $yRestore + 65); $restoreStatusLabel.AutoSize = $true; $restoreStatusLabel.Text = "Select items and source."; $restoreGroupBox.Controls.Add($restoreStatusLabel)
+$restoreStatusLabel = New-Object System.Windows.Forms.Label; $restoreStatusLabel.Location = [System.Drawing.Point]::new(10, $yRestore + 65); $restoreStatusLabel.AutoSize = $true; $restoreStatusLabel.Text = "Select items and source."; $restoreStatusLabel.ForeColor = $theme.Foreground; $restoreGroupBox.Controls.Add($restoreStatusLabel)
 
 #==================================================================
 # Button Click Logic
@@ -764,7 +816,6 @@ $browseBackupButton.Add_Click({ try { $folderBrowser = New-Object System.Windows
 $browseRestoreButton.Add_click({ try { $folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog; if ($folderBrowser.ShowDialog() -eq "OK") { $selectedPath = $folderBrowser.SelectedPath; $restorePathTextBox.Text = $selectedPath; if (-not $allBackupTasks) { $restoreStatusLabel.Text = "Error: Backup config not loaded."; return }; $backupSourceRoot = Get-ChildItem -Path (Join-Path -Path $selectedPath -ChildPath "backups") -Directory -ErrorAction SilentlyContinue | Select-Object -First 1; if ($backupSourceRoot) { foreach ($checkbox in $restoreCheckboxes) { $checkbox.Checked = $false; $appName = $checkbox.Text; $taskData = $allBackupTasks[$appName]; if ($taskData) { $expectedBackupPath = ""; if ($taskData.Export) { $expectedBackupPath = Join-Path -Path $backupSourceRoot.FullName -ChildPath $appName } else { $mangledPathName = ($taskData.Path -replace ':', ''); $expectedBackupPath = Join-Path -Path $backupSourceRoot.FullName -ChildPath $mangledPathName }; if (Test-Path -Path $expectedBackupPath) { $checkbox.Checked = $true } } } } else { foreach ($checkbox in $restoreCheckboxes) { $checkbox.Checked = $false } } } } catch { [System.Windows.Forms.MessageBox]::Show("An error occurred: $($_.Exception.Message)", "Error") } })
 $backupButton.Add_Click({ $selectedTasks = $backupCheckboxes | Where-Object { $_.Checked } | ForEach-Object { $_.Text }; if ($selectedTasks.Count -eq 0) { [System.Windows.Forms.MessageBox]::Show("Please select at least one item to back up.", "Error"); return }; if ([string]::IsNullOrWhiteSpace($backupPathTextBox.Text)) { [System.Windows.Forms.MessageBox]::Show("Please select a backup destination.", "Error"); return }; Start-AppBackup -baseDestination $backupPathTextBox.Text -selectedTasks $selectedTasks -statusLabel $backupStatusLabel -progressBar $backupProgressBar -form $form })
 $restoreButton.Add_Click({ $selectedTasks = $restoreCheckboxes | Where-Object { $_.Checked } | ForEach-Object { $_.Text }; if ($selectedTasks.Count -eq 0) { [System.Windows.Forms.MessageBox]::Show("Please select at least one item to restore.", "Error"); return }; if ([string]::IsNullOrWhiteSpace($restorePathTextBox.Text)) { [System.Windows.Forms.MessageBox]::Show("Please select the source backup folder.", "Error"); return }; Start-AppRestore -baseBackupPath $restorePathTextBox.Text -selectedTasks $selectedTasks -statusLabel $restoreStatusLabel -progressBar $restoreProgressBar -form $form })
-
 #==================================================================
 # SHOW FORM
 #==================================================================
