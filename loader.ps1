@@ -12,8 +12,8 @@ $branchName = "main" # IMPORTANT: Change this to "main" if that is your reposito
 # --- END CONFIGURATION ---
 
 # Construct the direct URL to the raw, pre-built script file
-$scriptUrl = "https://raw.githubusercontent.com/$githubUser/$repoName/$branchName/dist/Ahmaddxb-Customiser-SingleFile.ps1"
-
+$scriptUrl = "https://raw.githubusercontent.com/$githubUser/$repoName/refs/heads/$branchName/dist/Ahmaddxb-Customiser-SingleFile.ps1"
+https://raw.githubusercontent.com/ahmaddxb/Ahmad-PC-Customiser/refs/heads/main/loader.ps1
 Write-Host "Downloading and executing the customiser v2 from:"
 Write-Host $scriptUrl -ForegroundColor Cyan
 
