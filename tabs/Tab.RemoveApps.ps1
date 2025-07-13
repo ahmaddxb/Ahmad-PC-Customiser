@@ -65,17 +65,30 @@ $selectAllCheckbox.Add_Click({
 })
 
 $removeButton.Add_Click({
+    $failedApps = [System.Collections.Generic.List[string]]::new()
     foreach ($checkboxInfo in $checkboxes) {
         if ($checkboxInfo.Checkbox.Checked) {
             $friendlyName = $packageMappings[$checkboxInfo.Name]
-            $package = Get-AppxPackage -AllUsers -PackageTypeFilter Bundle -Name $checkboxInfo.Name
-            if ($null -ne $package) {
-                Write-Host "Removing the $friendlyName app..."
-                $package.PackageFullName | ForEach-Object { Remove-AppxPackage -Package $_ -AllUsers }
-                Write-Host "The $friendlyName app has been removed."
+            try {
+                $package = Get-AppxPackage -AllUsers -PackageTypeFilter Bundle -Name $checkboxInfo.Name
+                if ($null -ne $package) {
+                    Write-Host "Removing the $friendlyName app..."
+                    $package.PackageFullName | ForEach-Object { Remove-AppxPackage -Package $_ -AllUsers }
+                    Write-Host "The $friendlyName app has been removed."
+                }
+                else { Write-Host "The $friendlyName app is not installed." }
             }
-            else { Write-Host "The $friendlyName app is not installed." }
+            catch {
+                $failedApps.Add($friendlyName)
+            }
         }
+    }
+
+    if ($failedApps.Count -gt 0) {
+        $failedList = $failedApps -join "`n- "
+        [System.Windows.Forms.MessageBox]::Show("The following apps failed to uninstall:`n- $failedList`n`nPlease check your permissions and try again.", "Removal Failures", "OK", "Warning")
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("All selected apps have been removed successfully.", "Success", "OK", "Information")
     }
     RefreshCheckboxesRemoveApp
 })

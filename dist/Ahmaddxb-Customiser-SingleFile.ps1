@@ -104,6 +104,9 @@ $allBackupTasks = @{
     "mkcerts"          = @{ Path = "$env:LOCALAPPDATA\mkcert" }
     "JDownloader"      = @{ Path = "$env:ProgramFiles\JDownloader\cfg" }
     "Input Director"   = @{ Export = { & "C:\Program Files\Input Director\IDConfig.exe" -exportconfig:"$($destinationPath)\LatestConfig.xml" }; Import = { & "C:\Program Files\Input Director\IDConfig.exe" -importconfig:"$($sourcePath)\LatestConfig.xml" }; Path = "C:\Program Files\Input Director\IDConfig.exe" }
+    "SSH Keys"         = @{ Path = "$env:USERPROFILE\.ssh" }
+    "Game Saves"       = @{ Path = "$env:USERPROFILE\Saved Games" }
+    "Public Documents" = @{ Path = "$env:PUBLIC\Documents" } # <-- ADDED THIS LINE
 }
 
 # --- Backup Function ---
@@ -148,8 +151,6 @@ function Start-AppBackup {
             if (Test-Path -Path $task.Path) {
                 $destinationPath = Join-Path -Path $backupRoot -ChildPath ($task.Path -replace ':', '')
                 New-BackupFolder $destinationPath
-                # --- THIS LINE IS CORRECTED ---
-                # Removed "| Out-Null" which was causing the silent failure.
                 robocopy $task.Path $destinationPath /E /R:2 /W:5 /NFL /NDL /NJH /NJS /nc /ns /np
             } else { $skippedItems += $taskName }
         }
@@ -222,6 +223,7 @@ function Start-AppRestore {
         $statusLabel.Text = "Restore complete!"
     }
 }
+
 # --- From File: functions/App-Removal.functions.ps1 ---
 function RefreshCheckboxesRemoveApp {
     foreach ($checkboxInfo in $checkboxes) {
@@ -430,17 +432,30 @@ $selectAllCheckbox.Add_Click({
 })
 
 $removeButton.Add_Click({
+    $failedApps = [System.Collections.Generic.List[string]]::new()
     foreach ($checkboxInfo in $checkboxes) {
         if ($checkboxInfo.Checkbox.Checked) {
             $friendlyName = $packageMappings[$checkboxInfo.Name]
-            $package = Get-AppxPackage -AllUsers -PackageTypeFilter Bundle -Name $checkboxInfo.Name
-            if ($null -ne $package) {
-                Write-Host "Removing the $friendlyName app..."
-                $package.PackageFullName | ForEach-Object { Remove-AppxPackage -Package $_ -AllUsers }
-                Write-Host "The $friendlyName app has been removed."
+            try {
+                $package = Get-AppxPackage -AllUsers -PackageTypeFilter Bundle -Name $checkboxInfo.Name
+                if ($null -ne $package) {
+                    Write-Host "Removing the $friendlyName app..."
+                    $package.PackageFullName | ForEach-Object { Remove-AppxPackage -Package $_ -AllUsers }
+                    Write-Host "The $friendlyName app has been removed."
+                }
+                else { Write-Host "The $friendlyName app is not installed." }
             }
-            else { Write-Host "The $friendlyName app is not installed." }
+            catch {
+                $failedApps.Add($friendlyName)
+            }
         }
+    }
+
+    if ($failedApps.Count -gt 0) {
+        $failedList = $failedApps -join "`n- "
+        [System.Windows.Forms.MessageBox]::Show("The following apps failed to uninstall:`n- $failedList`n`nPlease check your permissions and try again.", "Removal Failures", "OK", "Warning")
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("All selected apps have been removed successfully.", "Success", "OK", "Information")
     }
     RefreshCheckboxesRemoveApp
 })
@@ -512,12 +527,28 @@ $tweaksActionPanel.Controls.Add($applyButtonWindowsTweaks)
 $refreshButtonWindowsTweaks.Add_Click({ RefreshCheckboxesTweaks })
 $clearButtonWindowsTweaks.Add_Click({ foreach ($checkbox in $checkboxesWindowsTweaks) { $checkbox.Checked = $false } })
 $applyButtonWindowsTweaks.Add_Click({
+    $failedTweaks = [System.Collections.Generic.List[string]]::new()
     foreach ($checkbox in $checkboxesWindowsTweaks) {
         if ($checkbox.Checked) {
             $tweakName = $checkbox.Text
-            if ($windowsTweaksMapping.ContainsKey($tweakName)) { & $windowsTweaksMapping[$tweakName] }
+            if ($windowsTweaksMapping.ContainsKey($tweakName)) {
+                try {
+                    & $windowsTweaksMapping[$tweakName]
+                }
+                catch {
+                    $failedTweaks.Add($tweakName)
+                }
+            }
         }
     }
+
+    if ($failedTweaks.Count -gt 0) {
+        $failedList = $failedTweaks -join "`n- "
+        [System.Windows.Forms.MessageBox]::Show("The following tweaks failed to apply:`n- $failedList`n`nPlease check your permissions and try again.", "Tweak Failures", "OK", "Warning")
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("All selected tweaks applied successfully.", "Success", "OK", "Information")
+    }
+
     Write-Host "Restarting Windows Explorer to apply changes..."
     Stop-Process -Name explorer -Force
     Write-Host "Explorer restarted."
@@ -609,17 +640,31 @@ $checkInstalledButton.Add_Click({
 
 $installButton.Add_Click({
     $installStatusLabel.Text = "Starting installations..."
+    $failedApps = [System.Collections.Generic.List[string]]::new()
+
     foreach ($checkbox in $checkboxesInstallApps) {
         if ($checkbox.Checked) {
             $appName = $checkbox.Text
             $appId = $appsToInstallMapping[$appName]
             $installStatusLabel.Text = "Installing $appName..."
             $form.Update()
-            winget install --id $appId -e --accept-package-agreements --accept-source-agreements
+            try {
+                winget install --id $appId -e --accept-package-agreements --accept-source-agreements
+            }
+            catch {
+                $failedApps.Add($appName)
+            }
         }
     }
+
+    if ($failedApps.Count -gt 0) {
+        $failedList = $failedApps -join "`n- "
+        [System.Windows.Forms.MessageBox]::Show("The following apps failed to install:`n- $failedList`n`nPlease check the logs for more details.", "Installation Failures", "OK", "Warning")
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("Selected applications have been installed.", "Installation Complete")
+    }
+
     $installStatusLabel.Text = "Installation process complete."
-    [System.Windows.Forms.MessageBox]::Show("Selected applications have been installed.", "Installation Complete")
 })
 # --- From File: tabs/Tab.Backup.ps1 ---
 $tabBackup = New-Object System.Windows.Forms.TabPage
@@ -631,7 +676,7 @@ $tabControl.Controls.Add($tabBackup)
 $backupRestoreItems = @(
     "MobaXterm", "Syncthing", "FileZilla", "Fences",
     "Windows Sidebar", "Windows Terminal", "mkcerts",
-    "JDownloader", "Input Director"
+    "JDownloader", "Input Director", "SSH Keys", "Game Saves", "Public Documents"
 )
 
 #==================================================================
@@ -639,7 +684,7 @@ $backupRestoreItems = @(
 #==================================================================
 $backupGroupBox = New-Object System.Windows.Forms.GroupBox
 $backupGroupBox.Location = [System.Drawing.Point]::new(10, 10)
-$backupGroupBox.Size = New-Object System.Drawing.Size(435, 290)
+$backupGroupBox.Size = New-Object System.Drawing.Size(425, 310) #<-- Adjusted height
 $backupGroupBox.Text = "Backup"
 $tabBackup.Controls.Add($backupGroupBox)
 
@@ -647,41 +692,39 @@ $tabBackup.Controls.Add($backupGroupBox)
 $backupCheckboxes = @()
 $yBackup = 30
 $selectAllBackupCheckbox = New-Object System.Windows.Forms.CheckBox
-$selectAllBackupCheckbox.Location = [System.Drawing.Point]::new(20, $yBackup); $selectAllBackupCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllBackupCheckbox.Text = "Select All"; $selectAllBackupCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold)
-$backupGroupBox.Controls.Add($selectAllBackupCheckbox)
-$yBackup += 25
+$selectAllBackupCheckbox.Location = [System.Drawing.Point]::new(20, $yBackup); $selectAllBackupCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllBackupCheckbox.Text = "Select All"; $selectAllBackupCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold); $backupGroupBox.Controls.Add($selectAllBackupCheckbox); $yBackup += 25
 
 $itemIndex = 0
-$itemsInFirstColumn = 5 
+$itemsInFirstColumn = [math]::Ceiling($backupRestoreItems.Count / 2)
 foreach ($item in $backupRestoreItems) {
     $xPos = 0; $yPos = 0
-    if ($itemIndex -lt $itemsInFirstColumn) { $xPos = 40; $yPos = $yBackup + ($itemIndex * 20) } else { $xPos = 220; $yPos = $yBackup + (($itemIndex - $itemsInFirstColumn) * 20) }
+    if ($itemIndex -lt $itemsInFirstColumn) {
+        $xPos = 40
+        $yPos = $yBackup + ($itemIndex * 20)
+    } else {
+        $xPos = 220
+        $yPos = $yBackup + (($itemIndex - $itemsInFirstColumn) * 20)
+    }
     $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item
     $backupGroupBox.Controls.Add($checkbox); $backupCheckboxes += $checkbox; $itemIndex++
 }
 $selectAllBackupCheckbox.Add_Click({ foreach ($cb in $backupCheckboxes) { $cb.Checked = $selectAllBackupCheckbox.Checked } })
 
 # --- Backup Destination and Button ---
-$yBackup = 160
+$yBackup = 180 #<-- CHANGED FROM 160
 $backupDestLabel = New-Object System.Windows.Forms.Label; $backupDestLabel.Location = [System.Drawing.Point]::new(10, $yBackup); $backupDestLabel.Size = New-Object System.Drawing.Size(400, 20); $backupDestLabel.Text = "Backup Destination:"; $backupGroupBox.Controls.Add($backupDestLabel); $yBackup += 20
 $backupPathTextBox = New-Object System.Windows.Forms.TextBox; $backupPathTextBox.Location = [System.Drawing.Point]::new(10, $yBackup); $backupPathTextBox.Size = New-Object System.Drawing.Size(320, 20); $backupPathTextBox.ReadOnly = $true; $backupGroupBox.Controls.Add($backupPathTextBox)
 $browseBackupButton = New-Object System.Windows.Forms.Button; $browseBackupButton.Location = [System.Drawing.Point]::new(340, $yBackup - 2); $browseBackupButton.Size = New-Object System.Drawing.Size(75, 25); $browseBackupButton.Text = "Browse..."; $backupGroupBox.Controls.Add($browseBackupButton); $yBackup += 30
 $backupButton = New-Object System.Windows.Forms.Button; $backupButton.Location = [System.Drawing.Point]::new(150, $yBackup); $backupButton.Size = New-Object System.Drawing.Size(120, 30); $backupButton.Text = "Start Backup"; $backupButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $backupGroupBox.Controls.Add($backupButton)
 $backupProgressBar = New-Object System.Windows.Forms.ProgressBar; $backupProgressBar.Location = [System.Drawing.Point]::new(10, $yBackup + 40); $backupProgressBar.Size = New-Object System.Drawing.Size(405, 20); $backupGroupBox.Controls.Add($backupProgressBar)
-
-# CORRECTED: Set AutoSize to true for the status label
-$backupStatusLabel = New-Object System.Windows.Forms.Label
-$backupStatusLabel.Location = [System.Drawing.Point]::new(10, $yBackup + 65)
-$backupStatusLabel.AutoSize = $true #<-- This allows the label to set its own height
-$backupStatusLabel.Text = "Select items and destination."
-$backupGroupBox.Controls.Add($backupStatusLabel)
+$backupStatusLabel = New-Object System.Windows.Forms.Label; $backupStatusLabel.Location = [System.Drawing.Point]::new(10, $yBackup + 65); $backupStatusLabel.AutoSize = $true; $backupStatusLabel.Text = "Select items and destination."; $backupGroupBox.Controls.Add($backupStatusLabel)
 
 #==================================================================
 # GroupBox for Restore
 #==================================================================
 $restoreGroupBox = New-Object System.Windows.Forms.GroupBox
-$restoreGroupBox.Location = [System.Drawing.Point]::new(10, 310)
-$restoreGroupBox.Size = New-Object System.Drawing.Size(435, 290)
+$restoreGroupBox.Location = [System.Drawing.Point]::new(10, 330) #<-- Adjusted Y
+$restoreGroupBox.Size = New-Object System.Drawing.Size(425, 310) #<-- Adjusted height
 $restoreGroupBox.Text = "Restore"
 $tabBackup.Controls.Add($restoreGroupBox)
 
@@ -693,26 +736,26 @@ $selectAllRestoreCheckbox = New-Object System.Windows.Forms.CheckBox; $selectAll
 $itemIndex = 0
 foreach ($item in $backupRestoreItems) {
     $xPos = 0; $yPos = 0
-    if ($itemIndex -lt $itemsInFirstColumn) { $xPos = 40; $yPos = $yRestore + ($itemIndex * 20) } else { $xPos = 220; $yPos = $yRestore + (($itemIndex - $itemsInFirstColumn) * 20) }
+    if ($itemIndex -lt $itemsInFirstColumn) {
+        $xPos = 40
+        $yPos = $yRestore + ($itemIndex * 20)
+    } else {
+        $xPos = 220
+        $yPos = $yRestore + (($itemIndex - $itemsInFirstColumn) * 20)
+    }
     $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item
     $restoreGroupBox.Controls.Add($checkbox); $restoreCheckboxes += $checkbox; $itemIndex++
 }
 $selectAllRestoreCheckbox.Add_Click({ foreach ($cb in $restoreCheckboxes) { $cb.Checked = $selectAllRestoreCheckbox.Checked } })
 
 # --- Restore Source and Button ---
-$yRestore = 160
+$yRestore = 180 #<-- CHANGED FROM 160
 $restoreDestLabel = New-Object System.Windows.Forms.Label; $restoreDestLabel.Location = [System.Drawing.Point]::new(10, $yRestore); $restoreDestLabel.Size = New-Object System.Drawing.Size(400, 20); $restoreDestLabel.Text = "Restore From (select parent folder):"; $restoreGroupBox.Controls.Add($restoreDestLabel); $yRestore += 20
 $restorePathTextBox = New-Object System.Windows.Forms.TextBox; $restorePathTextBox.Location = [System.Drawing.Point]::new(10, $yRestore); $restorePathTextBox.Size = New-Object System.Drawing.Size(320, 20); $restorePathTextBox.ReadOnly = $true; $restoreGroupBox.Controls.Add($restorePathTextBox)
 $browseRestoreButton = New-Object System.Windows.Forms.Button; $browseRestoreButton.Location = [System.Drawing.Point]::new(340, $yRestore - 2); $browseRestoreButton.Size = New-Object System.Drawing.Size(75, 25); $browseRestoreButton.Text = "Browse..."; $restoreGroupBox.Controls.Add($browseRestoreButton); $yRestore += 30
 $restoreButton = New-Object System.Windows.Forms.Button; $restoreButton.Location = [System.Drawing.Point]::new(150, $yRestore); $restoreButton.Size = New-Object System.Drawing.Size(120, 30); $restoreButton.Text = "Start Restore"; $restoreButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $restoreGroupBox.Controls.Add($restoreButton)
 $restoreProgressBar = New-Object System.Windows.Forms.ProgressBar; $restoreProgressBar.Location = [System.Drawing.Point]::new(10, $yRestore + 40); $restoreProgressBar.Size = New-Object System.Drawing.Size(405, 20); $restoreGroupBox.Controls.Add($restoreProgressBar)
-
-# CORRECTED: Set AutoSize to true for the status label
-$restoreStatusLabel = New-Object System.Windows.Forms.Label
-$restoreStatusLabel.Location = [System.Drawing.Point]::new(10, $yRestore + 65)
-$restoreStatusLabel.AutoSize = $true #<-- This allows the label to set its own height
-$restoreStatusLabel.Text = "Select items and source."
-$restoreGroupBox.Controls.Add($restoreStatusLabel)
+$restoreStatusLabel = New-Object System.Windows.Forms.Label; $restoreStatusLabel.Location = [System.Drawing.Point]::new(10, $yRestore + 65); $restoreStatusLabel.AutoSize = $true; $restoreStatusLabel.Text = "Select items and source."; $restoreGroupBox.Controls.Add($restoreStatusLabel)
 
 #==================================================================
 # Button Click Logic
@@ -721,6 +764,7 @@ $browseBackupButton.Add_Click({ try { $folderBrowser = New-Object System.Windows
 $browseRestoreButton.Add_click({ try { $folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog; if ($folderBrowser.ShowDialog() -eq "OK") { $selectedPath = $folderBrowser.SelectedPath; $restorePathTextBox.Text = $selectedPath; if (-not $allBackupTasks) { $restoreStatusLabel.Text = "Error: Backup config not loaded."; return }; $backupSourceRoot = Get-ChildItem -Path (Join-Path -Path $selectedPath -ChildPath "backups") -Directory -ErrorAction SilentlyContinue | Select-Object -First 1; if ($backupSourceRoot) { foreach ($checkbox in $restoreCheckboxes) { $checkbox.Checked = $false; $appName = $checkbox.Text; $taskData = $allBackupTasks[$appName]; if ($taskData) { $expectedBackupPath = ""; if ($taskData.Export) { $expectedBackupPath = Join-Path -Path $backupSourceRoot.FullName -ChildPath $appName } else { $mangledPathName = ($taskData.Path -replace ':', ''); $expectedBackupPath = Join-Path -Path $backupSourceRoot.FullName -ChildPath $mangledPathName }; if (Test-Path -Path $expectedBackupPath) { $checkbox.Checked = $true } } } } else { foreach ($checkbox in $restoreCheckboxes) { $checkbox.Checked = $false } } } } catch { [System.Windows.Forms.MessageBox]::Show("An error occurred: $($_.Exception.Message)", "Error") } })
 $backupButton.Add_Click({ $selectedTasks = $backupCheckboxes | Where-Object { $_.Checked } | ForEach-Object { $_.Text }; if ($selectedTasks.Count -eq 0) { [System.Windows.Forms.MessageBox]::Show("Please select at least one item to back up.", "Error"); return }; if ([string]::IsNullOrWhiteSpace($backupPathTextBox.Text)) { [System.Windows.Forms.MessageBox]::Show("Please select a backup destination.", "Error"); return }; Start-AppBackup -baseDestination $backupPathTextBox.Text -selectedTasks $selectedTasks -statusLabel $backupStatusLabel -progressBar $backupProgressBar -form $form })
 $restoreButton.Add_Click({ $selectedTasks = $restoreCheckboxes | Where-Object { $_.Checked } | ForEach-Object { $_.Text }; if ($selectedTasks.Count -eq 0) { [System.Windows.Forms.MessageBox]::Show("Please select at least one item to restore.", "Error"); return }; if ([string]::IsNullOrWhiteSpace($restorePathTextBox.Text)) { [System.Windows.Forms.MessageBox]::Show("Please select the source backup folder.", "Error"); return }; Start-AppRestore -baseBackupPath $restorePathTextBox.Text -selectedTasks $selectedTasks -statusLabel $restoreStatusLabel -progressBar $restoreProgressBar -form $form })
+
 #==================================================================
 # SHOW FORM
 #==================================================================

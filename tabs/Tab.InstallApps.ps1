@@ -80,15 +80,29 @@ $checkInstalledButton.Add_Click({
 
 $installButton.Add_Click({
     $installStatusLabel.Text = "Starting installations..."
+    $failedApps = [System.Collections.Generic.List[string]]::new()
+
     foreach ($checkbox in $checkboxesInstallApps) {
         if ($checkbox.Checked) {
             $appName = $checkbox.Text
             $appId = $appsToInstallMapping[$appName]
             $installStatusLabel.Text = "Installing $appName..."
             $form.Update()
-            winget install --id $appId -e --accept-package-agreements --accept-source-agreements
+            try {
+                winget install --id $appId -e --accept-package-agreements --accept-source-agreements
+            }
+            catch {
+                $failedApps.Add($appName)
+            }
         }
     }
+
+    if ($failedApps.Count -gt 0) {
+        $failedList = $failedApps -join "`n- "
+        [System.Windows.Forms.MessageBox]::Show("The following apps failed to install:`n- $failedList`n`nPlease check the logs for more details.", "Installation Failures", "OK", "Warning")
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("Selected applications have been installed.", "Installation Complete")
+    }
+
     $installStatusLabel.Text = "Installation process complete."
-    [System.Windows.Forms.MessageBox]::Show("Selected applications have been installed.", "Installation Complete")
 })

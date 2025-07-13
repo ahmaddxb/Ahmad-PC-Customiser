@@ -60,12 +60,28 @@ $tweaksActionPanel.Controls.Add($applyButtonWindowsTweaks)
 $refreshButtonWindowsTweaks.Add_Click({ RefreshCheckboxesTweaks })
 $clearButtonWindowsTweaks.Add_Click({ foreach ($checkbox in $checkboxesWindowsTweaks) { $checkbox.Checked = $false } })
 $applyButtonWindowsTweaks.Add_Click({
+    $failedTweaks = [System.Collections.Generic.List[string]]::new()
     foreach ($checkbox in $checkboxesWindowsTweaks) {
         if ($checkbox.Checked) {
             $tweakName = $checkbox.Text
-            if ($windowsTweaksMapping.ContainsKey($tweakName)) { & $windowsTweaksMapping[$tweakName] }
+            if ($windowsTweaksMapping.ContainsKey($tweakName)) {
+                try {
+                    & $windowsTweaksMapping[$tweakName]
+                }
+                catch {
+                    $failedTweaks.Add($tweakName)
+                }
+            }
         }
     }
+
+    if ($failedTweaks.Count -gt 0) {
+        $failedList = $failedTweaks -join "`n- "
+        [System.Windows.Forms.MessageBox]::Show("The following tweaks failed to apply:`n- $failedList`n`nPlease check your permissions and try again.", "Tweak Failures", "OK", "Warning")
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("All selected tweaks applied successfully.", "Success", "OK", "Information")
+    }
+
     Write-Host "Restarting Windows Explorer to apply changes..."
     Stop-Process -Name explorer -Force
     Write-Host "Explorer restarted."
