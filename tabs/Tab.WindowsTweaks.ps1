@@ -27,14 +27,14 @@ foreach ($tweakName in $windowsTweaksMapping.Keys) {
     $checkbox = New-Object System.Windows.Forms.CheckBox
     $checkbox.Text = $tweakName
     $checkbox.Location = [System.Drawing.Point]::new(20, $yPos) # Moved left
-    $checkbox.Width = 420 # Keep width to prevent text cutoff
+    $checkbox.Width = 410 # Keep width to prevent text cutoff
     $tweaksGroupBox.Controls.Add($checkbox)
     $checkboxesWindowsTweaks += $checkbox
     $yPos += 22 # Use tight spacing
 }
 
 # Dynamically set the height of the GroupBox to fit its content
-$tweaksGroupBox.Size = [System.Drawing.Size]::new(425, $yPos + 15)
+$tweaksGroupBox.Size = [System.Drawing.Size]::new(435, $yPos + 15)
 
 
 # --- 5. Add Buttons to the FIXED Action Panel ---

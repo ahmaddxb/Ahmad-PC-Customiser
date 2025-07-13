@@ -29,10 +29,10 @@ function IsTweakApplied($tweakName) {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -ErrorAction SilentlyContinue
             return ($registryValue -eq 0)
         }
-        "Hide Chat on Task Bar" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarMn" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 0)
-        }
+        # "Hide Chat on Task Bar" {
+        #     $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarMn" -ErrorAction SilentlyContinue
+        #     return ($registryValue -eq 0)
+        # }
         "disable search web results on Windows 11" {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Name "DisableSearchBoxSuggestions" -ErrorAction SilentlyContinue
             return ($registryValue -eq 1)
@@ -41,10 +41,10 @@ function IsTweakApplied($tweakName) {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" -Name "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" -ErrorAction SilentlyContinue
             return ($null -ne $registryValue -and $registryValue -eq 0)
         }
-        "Turn on Use Print Screen Key to Open Screen Snipping" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Keyboard" -Name "PrintScreenKeyForSnippingEnabled" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
+        # "Turn on Use Print Screen Key to Open Screen Snipping" {
+        #     $registryValue = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Keyboard" -Name "PrintScreenKeyForSnippingEnabled" -ErrorAction SilentlyContinue
+        #     return ($registryValue -eq 1)
+        # }
         "Turn On Set Time Zone Automatically" {
             $registryValue = Get-ItemPropertyValue -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -Name "Start" -ErrorAction SilentlyContinue
             return ($registryValue -eq 3)
@@ -62,10 +62,10 @@ function IsTweakApplied($tweakName) {
             $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -ErrorAction SilentlyContinue
             return ($registryValue -eq 0)
         }
-        "Turn On Receive Updates for Other Microsoft Products" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "AllowMUUpdateService" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
+        # "Turn On Receive Updates for Other Microsoft Products" {
+        #     $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "AllowMUUpdateService" -ErrorAction SilentlyContinue
+        #     return ($registryValue -eq 1)
+        # }
         "Turn On Get me up to date for Windows Update" {
             $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "IsExpedited" -ErrorAction SilentlyContinue
             return ($registryValue -eq 1)
