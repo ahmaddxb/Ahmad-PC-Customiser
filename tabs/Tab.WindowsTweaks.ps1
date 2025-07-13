@@ -1,92 +1,88 @@
-function IsTweakApplied($tweakName) {
-    switch ($tweakName) {
-        "Enable Dark Mode" {
-            $appsUseLightTheme = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "AppsUseLightTheme" -ErrorAction SilentlyContinue
-            $systemUsesLightTheme = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "SystemUsesLightTheme" -ErrorAction SilentlyContinue
-            return ($appsUseLightTheme -eq 0) -and ($systemUsesLightTheme -eq 0)
-        }
-        "Open File Explorer to This PC" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "LaunchTo" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        "File Explorer Show File Extentions" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 0)
-        }
-        "File Explorer show hidden files" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        "Hide Widget on Task Bar" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarDa" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 0)
-        }
-        "Set desktop icon size to small" {
-            $iconSizeValue = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop" -Name "IconSize" -ErrorAction SilentlyContinue
-            return ($iconSizeValue -eq 32)
-        }
-        "windows 11 task bar to hide search" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 0)
-        }
-        "Hide Chat on Task Bar" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarMn" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 0)
-        }
-        "disable search web results on Windows 11" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Name "DisableSearchBoxSuggestions" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        "Show This PC on desktop" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" -Name "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" -ErrorAction SilentlyContinue
-            return ($null -ne $registryValue -and $registryValue -eq 0)
-        }
-        "Turn on Use Print Screen Key to Open Screen Snipping" {
-            $registryValue = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Keyboard" -Name "PrintScreenKeyForSnippingEnabled" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        "Turn On Set Time Zone Automatically" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate" -Name "Start" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 3)
-        }
-        "Change Time Format" {
-            $sShortTime = Get-ItemPropertyValue -Path "HKCU:\Control Panel\International" -Name "sShortTime" -ErrorAction SilentlyContinue
-            $sTimeFormat = Get-ItemPropertyValue -Path "HKCU:\Control Panel\International" -Name "sTimeFormat" -ErrorAction SilentlyContinue
-            return ($sShortTime -eq "h:mm tt") -and ($sTimeFormat -eq "h:mm:ss tt")
-        }
-        "Turn off Automatic Proxy Configuration" {
-            $ProxyEnable = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyEnable" -ErrorAction SilentlyContinue
-            return ($ProxyEnable -eq 0)
-        }
-        "Change UAC Behavior for Administrators to Elevate without prompting" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 0)
-        }
-        "Turn On Receive Updates for Other Microsoft Products" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "AllowMUUpdateService" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        "Turn On Get me up to date for Windows Update" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "IsExpedited" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        "Turn On Auto-restart Notifications for Windows Update in Settings" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "RestartNotificationsAllowed2" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        "Get Latest Updates as soon as available in Windows 11" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "IsContinuousInnovationOptedIn" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
-        default {
-            return $false
-        }
-    }
+$tabWindowsTweaks = New-Object System.Windows.Forms.TabPage
+$tabWindowsTweaks.Text = "Windows Tweaks"
+$tabControl.Controls.Add($tabWindowsTweaks)
+
+# --- 1. Create a Panel for the Buttons (at the bottom) ---
+$tweaksActionPanel = New-Object System.Windows.Forms.Panel
+$tweaksActionPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
+$tweaksActionPanel.Height = 50
+$tabWindowsTweaks.Controls.Add($tweaksActionPanel)
+
+# --- 2. Create a Panel for the Content (fills the rest of the space) ---
+$tweaksContentPanel = New-Object System.Windows.Forms.Panel
+$tweaksContentPanel.Dock = [System.Windows.Forms.DockStyle]::Fill
+$tweaksContentPanel.AutoScroll = $true # This panel will handle scrolling
+$tabWindowsTweaks.Controls.Add($tweaksContentPanel)
+
+# --- 3. Create a GroupBox to contain the tweaks ---
+$tweaksGroupBox = New-Object System.Windows.Forms.GroupBox
+$tweaksGroupBox.Location = [System.Drawing.Point]::new(10, 10)
+$tweaksGroupBox.Text = "System & Explorer Tweaks"
+$tweaksContentPanel.Controls.Add($tweaksGroupBox)
+
+# --- 4. Add Content to the GroupBox ---
+$checkboxesWindowsTweaks = @()
+$yPos = 30 # Start Y position inside the GroupBox
+foreach ($tweakName in $windowsTweaksMapping.Keys) {
+    $checkbox = New-Object System.Windows.Forms.CheckBox
+    $checkbox.Text = $tweakName
+    $checkbox.Location = [System.Drawing.Point]::new(20, $yPos) # Moved left
+    $checkbox.Width = 410 # Keep width to prevent text cutoff
+    $tweaksGroupBox.Controls.Add($checkbox)
+    $checkboxesWindowsTweaks += $checkbox
+    $yPos += 22 # Use tight spacing
 }
 
-function RefreshCheckboxesTweaks {
+# Dynamically set the height of the GroupBox to fit its content
+$tweaksGroupBox.Size = [System.Drawing.Size]::new(435, $yPos + 15)
+
+
+# --- 5. Add Buttons to the FIXED Action Panel ---
+$refreshButtonWindowsTweaks = New-Object System.Windows.Forms.Button
+$refreshButtonWindowsTweaks.Text = "Refresh"
+$refreshButtonWindowsTweaks.Location = [System.Drawing.Point]::new(200, 10)
+$refreshButtonWindowsTweaks.Size = New-Object System.Drawing.Size(100, 30)
+$tweaksActionPanel.Controls.Add($refreshButtonWindowsTweaks)
+
+$clearButtonWindowsTweaks = New-Object System.Windows.Forms.Button
+$clearButtonWindowsTweaks.Text = "Clear Checks"
+$clearButtonWindowsTweaks.Location = [System.Drawing.Point]::new(90, 10)
+$clearButtonWindowsTweaks.Size = New-Object System.Drawing.Size(100, 30)
+$tweaksActionPanel.Controls.Add($clearButtonWindowsTweaks)
+
+$applyButtonWindowsTweaks = New-Object System.Windows.Forms.Button
+$applyButtonWindowsTweaks.Location = [System.Drawing.Point]::new(310, 10)
+$applyButtonWindowsTweaks.Size = New-Object System.Drawing.Size(100, 30)
+$applyButtonWindowsTweaks.Text = "Apply"
+$tweaksActionPanel.Controls.Add($applyButtonWindowsTweaks)
+
+# --- 6. Button Click Logic ---
+$refreshButtonWindowsTweaks.Add_Click({ RefreshCheckboxesTweaks })
+$clearButtonWindowsTweaks.Add_Click({ foreach ($checkbox in $checkboxesWindowsTweaks) { $checkbox.Checked = $false } })
+$applyButtonWindowsTweaks.Add_Click({
     foreach ($checkbox in $checkboxesWindowsTweaks) {
-        $tweakName = $checkbox.Text
-        $checkbox.Checked = IsTweakApplied($tweakName)
+        if ($checkbox.Checked) {
+            $tweakName = $checkbox.Text
+            if ($windowsTweaksMapping.ContainsKey($tweakName)) { & $windowsTweaksMapping[$tweakName] }
+        }
     }
-}
+    Write-Host "Restarting Windows Explorer to apply changes..."
+    Stop-Process -Name explorer -Force
+    Write-Host "Explorer restarted."
+    RefreshCheckboxesTweaks
+})
+
+# Initial check
+# --- DEBUGGING STEP ---
+# Get the text content of the IsTweakApplied function as it exists in memory right now.
+$functionContent = Get-Content Function:\IsTweakApplied
+# Save that content to a file on your Desktop.
+$functionContent | Out-File -FilePath "$env:USERPROFILE\Desktop\DEBUG_Function_Content.txt" -Encoding utf8 -Force
+# Show a message box to alert you that the file has been created.
+[System.Windows.Forms.MessageBox]::Show(
+    "A debug file named 'DEBUG_Function_Content.txt' has been created on your Desktop. Please open it and check its contents.",
+    "Debug Info"
+)
+
+# Initial check
+RefreshCheckboxesTweaks
