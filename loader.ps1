@@ -8,7 +8,7 @@
 # Make sure these match your GitHub username, repository name, and branch.
 $githubUser = "ahmaddxb"
 $repoName   = "Ahmad-PC-Customiser"
-$branchName = "master" # IMPORTANT: Change this to "main" if that is your repository's default branch.
+$branchName = "main" # IMPORTANT: Change this to "main" if that is your repository's default branch.
 # --- END CONFIGURATION ---
 
 # Construct the direct URL to the raw, pre-built script file
