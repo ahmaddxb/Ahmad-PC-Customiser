@@ -491,14 +491,14 @@ foreach ($tweakName in $windowsTweaksMapping.Keys) {
     $checkbox = New-Object System.Windows.Forms.CheckBox
     $checkbox.Text = $tweakName
     $checkbox.Location = [System.Drawing.Point]::new(20, $yPos) # Moved left
-    $checkbox.Width = 410 # Keep width to prevent text cutoff
+    $checkbox.Width = 420 # Keep width to prevent text cutoff
     $tweaksGroupBox.Controls.Add($checkbox)
     $checkboxesWindowsTweaks += $checkbox
     $yPos += 22 # Use tight spacing
 }
 
 # Dynamically set the height of the GroupBox to fit its content
-$tweaksGroupBox.Size = [System.Drawing.Size]::new(435, $yPos + 15)
+$tweaksGroupBox.Size = [System.Drawing.Size]::new(425, $yPos + 15)
 
 
 # --- 5. Add Buttons to the FIXED Action Panel ---
@@ -537,19 +537,8 @@ $applyButtonWindowsTweaks.Add_Click({
 })
 
 # Initial check
-# --- DEBUGGING STEP ---
-# Get the text content of the IsTweakApplied function as it exists in memory right now.
-$functionContent = Get-Content Function:\IsTweakApplied
-# Save that content to a file on your Desktop.
-$functionContent | Out-File -FilePath "$env:USERPROFILE\Desktop\DEBUG_Function_Content.txt" -Encoding utf8 -Force
-# Show a message box to alert you that the file has been created.
-[System.Windows.Forms.MessageBox]::Show(
-    "A debug file named 'DEBUG_Function_Content.txt' has been created on your Desktop. Please open it and check its contents.",
-    "Debug Info"
-)
-
-# Initial check
 RefreshCheckboxesTweaks
+
 # --- From File: tabs/Tab.InstallApps.ps1 ---
 $tabInstallApps = New-Object System.Windows.Forms.TabPage
 $tabInstallApps.Text = "Install Apps"
