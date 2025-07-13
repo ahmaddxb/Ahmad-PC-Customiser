@@ -62,10 +62,10 @@ function IsTweakApplied($tweakName) {
             $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -ErrorAction SilentlyContinue
             return ($registryValue -eq 0)
         }
-        "Turn On Receive Updates for Other Microsoft Products" {
-            $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "AllowMUUpdateService" -ErrorAction SilentlyContinue
-            return ($registryValue -eq 1)
-        }
+        # "Turn On Receive Updates for Other Microsoft Products" {
+        #     $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "AllowMUUpdateService" -ErrorAction SilentlyContinue
+        #     return ($registryValue -eq 1)
+        # }
         "Turn On Get me up to date for Windows Update" {
             $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "IsExpedited" -ErrorAction SilentlyContinue
             return ($registryValue -eq 1)
