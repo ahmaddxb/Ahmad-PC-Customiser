@@ -1,0 +1,4 @@
+Backup / restore
+
+.ssh folder
+game save folder
