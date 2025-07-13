@@ -19,17 +19,14 @@ if (-not (Test-Path -Path $OutputDirectory)) {
 }
 
 # --- 2. Define the exact order to combine the files ---
-# This order is critical for the script to function correctly.
 $filesToCombine = @(
-    # Configurations must be loaded first
     "config/RemoveApps.config.ps1",
     "config/WindowsTweaks.config.ps1",
     "config/InstallApps.config.ps1",
-    "functions/Backup.functions.ps1", # Needs $allBackupTasks from its own file
+    "functions/Backup.functions.ps1",
     "functions/App-Removal.functions.ps1",
     "functions/Tweak-Checks.functions.ps1",
     "functions/App-Install.functions.ps1",
-    # The UI code for each tab will be added after the main form is defined
     "tabs/Tab.RemoveApps.ps1",
     "tabs/Tab.WindowsTweaks.ps1",
     "tabs/Tab.InstallApps.ps1",
@@ -38,8 +35,6 @@ $filesToCombine = @(
 
 # --- 3. Start building the final script content ---
 Write-Host "Combining script files..."
-
-# Start with the mandatory header and comments
 $combinedScriptContent = @"
 #----------------------------------
 #  Ahmaddxb Windows Customiser
@@ -54,63 +49,42 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     Start-Process powershell -Verb runAs -ArgumentList `$arguments
     break
 }
-
 "@
 
-# Helper function to read and append file content
 function Append-ScriptFile {
     param($RelativePath)
     $fullPath = Join-Path -Path $PSScriptRoot -ChildPath $RelativePath
     if (Test-Path $fullPath) {
         return "`n# --- From File: $RelativePath ---`n" + (Get-Content -Path $fullPath -Raw)
     } else {
-        Write-Warning "File not found: $fullPath"
-        return ""
+        Write-Warning "File not found: $fullPath"; return ""
     }
 }
 
 # --- 4. Combine files in the correct order ---
-
-# Add all configuration files
 $combinedScriptContent += Append-ScriptFile -RelativePath "config/RemoveApps.config.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "config/WindowsTweaks.config.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "config/InstallApps.config.ps1"
-
-# Add all function files
 $combinedScriptContent += Append-ScriptFile -RelativePath "functions/Backup.functions.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "functions/App-Removal.functions.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "functions/Tweak-Checks.functions.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "functions/App-Install.functions.ps1"
 
-# Add the main UI creation code
 $combinedScriptContent += @"
 
 #==================================================================
 # FORM AND UI CREATION
 #==================================================================
 Add-Type -AssemblyName System.Windows.Forms
-
-# --- Main Form ---
-`$form = New-Object System.Windows.Forms.Form
-`$form.Text = "Ahmaddxb Windows Customiser"
-`$form.Size = New-Object System.Drawing.Size(500, 850)
-`$form.StartPosition = "CenterScreen"
-`$form.FormBorderStyle = "Sizable"
-`$form.Font = New-Object System.Drawing.Font("Segoe UI", 9)
-
-# --- Main TabControl ---
-`$tabControl = New-Object System.Windows.Forms.TabControl
-`$tabControl.Dock = [System.Windows.Forms.DockStyle]::Fill
-`$form.Controls.Add(`$tabControl)
+`$form = New-Object System.Windows.Forms.Form; `$form.Text = 'Ahmaddxb Windows Customiser'; `$form.Size = New-Object System.Drawing.Size(500, 850); `$form.StartPosition = 'CenterScreen'; `$form.FormBorderStyle = 'Sizable'; `$form.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+`$tabControl = New-Object System.Windows.Forms.TabControl; `$tabControl.Dock = [System.Windows.Forms.DockStyle]::Fill; `$form.Controls.Add(`$tabControl)
 "@
 
-# Add all tab UI files
 $combinedScriptContent += Append-ScriptFile -RelativePath "tabs/Tab.RemoveApps.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "tabs/Tab.WindowsTweaks.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "tabs/Tab.InstallApps.ps1"
 $combinedScriptContent += Append-ScriptFile -RelativePath "tabs/Tab.Backup.ps1"
 
-# Add the final execution command
 $combinedScriptContent += @"
 
 #==================================================================
@@ -121,7 +95,10 @@ $combinedScriptContent += @"
 
 # --- 5. Write the combined content to the output file ---
 try {
-    $combinedScriptContent | Out-File -FilePath $OutputFilePath -Encoding utf8 -Force
+    # CORRECTED: Use an encoding that does not write a Byte Order Mark (BOM)
+    $encoding = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllLines($OutputFilePath, $combinedScriptContent, $encoding)
+    
     Write-Host "Build successful!" -ForegroundColor Green
     Write-Host "Combined script created at: $OutputFilePath"
 }
