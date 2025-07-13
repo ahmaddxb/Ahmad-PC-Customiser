@@ -7,7 +7,7 @@ $tabControl.Controls.Add($tabBackup)
 $backupRestoreItems = @(
     "MobaXterm", "Syncthing", "FileZilla", "Fences",
     "Windows Sidebar", "Windows Terminal", "mkcerts",
-    "JDownloader", "Input Director"
+    "JDownloader", "Input Director", "SSH Keys", "Game Saves", "Public Documents"
 )
 
 #==================================================================
@@ -15,7 +15,7 @@ $backupRestoreItems = @(
 #==================================================================
 $backupGroupBox = New-Object System.Windows.Forms.GroupBox
 $backupGroupBox.Location = [System.Drawing.Point]::new(10, 10)
-$backupGroupBox.Size = New-Object System.Drawing.Size(435, 290)
+$backupGroupBox.Size = New-Object System.Drawing.Size(425, 310) #<-- Adjusted height
 $backupGroupBox.Text = "Backup"
 $tabBackup.Controls.Add($backupGroupBox)
 
@@ -23,41 +23,39 @@ $tabBackup.Controls.Add($backupGroupBox)
 $backupCheckboxes = @()
 $yBackup = 30
 $selectAllBackupCheckbox = New-Object System.Windows.Forms.CheckBox
-$selectAllBackupCheckbox.Location = [System.Drawing.Point]::new(20, $yBackup); $selectAllBackupCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllBackupCheckbox.Text = "Select All"; $selectAllBackupCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold)
-$backupGroupBox.Controls.Add($selectAllBackupCheckbox)
-$yBackup += 25
+$selectAllBackupCheckbox.Location = [System.Drawing.Point]::new(20, $yBackup); $selectAllBackupCheckbox.Size = New-Object System.Drawing.Size(300, 20); $selectAllBackupCheckbox.Text = "Select All"; $selectAllBackupCheckbox.Font = New-Object System.Drawing.Font("Arial", 9, [System.Drawing.FontStyle]::Bold); $backupGroupBox.Controls.Add($selectAllBackupCheckbox); $yBackup += 25
 
 $itemIndex = 0
-$itemsInFirstColumn = 5 
+$itemsInFirstColumn = [math]::Ceiling($backupRestoreItems.Count / 2)
 foreach ($item in $backupRestoreItems) {
     $xPos = 0; $yPos = 0
-    if ($itemIndex -lt $itemsInFirstColumn) { $xPos = 40; $yPos = $yBackup + ($itemIndex * 20) } else { $xPos = 220; $yPos = $yBackup + (($itemIndex - $itemsInFirstColumn) * 20) }
+    if ($itemIndex -lt $itemsInFirstColumn) {
+        $xPos = 40
+        $yPos = $yBackup + ($itemIndex * 20)
+    } else {
+        $xPos = 220
+        $yPos = $yBackup + (($itemIndex - $itemsInFirstColumn) * 20)
+    }
     $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item
     $backupGroupBox.Controls.Add($checkbox); $backupCheckboxes += $checkbox; $itemIndex++
 }
 $selectAllBackupCheckbox.Add_Click({ foreach ($cb in $backupCheckboxes) { $cb.Checked = $selectAllBackupCheckbox.Checked } })
 
 # --- Backup Destination and Button ---
-$yBackup = 160
+$yBackup = 180 #<-- CHANGED FROM 160
 $backupDestLabel = New-Object System.Windows.Forms.Label; $backupDestLabel.Location = [System.Drawing.Point]::new(10, $yBackup); $backupDestLabel.Size = New-Object System.Drawing.Size(400, 20); $backupDestLabel.Text = "Backup Destination:"; $backupGroupBox.Controls.Add($backupDestLabel); $yBackup += 20
 $backupPathTextBox = New-Object System.Windows.Forms.TextBox; $backupPathTextBox.Location = [System.Drawing.Point]::new(10, $yBackup); $backupPathTextBox.Size = New-Object System.Drawing.Size(320, 20); $backupPathTextBox.ReadOnly = $true; $backupGroupBox.Controls.Add($backupPathTextBox)
 $browseBackupButton = New-Object System.Windows.Forms.Button; $browseBackupButton.Location = [System.Drawing.Point]::new(340, $yBackup - 2); $browseBackupButton.Size = New-Object System.Drawing.Size(75, 25); $browseBackupButton.Text = "Browse..."; $backupGroupBox.Controls.Add($browseBackupButton); $yBackup += 30
 $backupButton = New-Object System.Windows.Forms.Button; $backupButton.Location = [System.Drawing.Point]::new(150, $yBackup); $backupButton.Size = New-Object System.Drawing.Size(120, 30); $backupButton.Text = "Start Backup"; $backupButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $backupGroupBox.Controls.Add($backupButton)
 $backupProgressBar = New-Object System.Windows.Forms.ProgressBar; $backupProgressBar.Location = [System.Drawing.Point]::new(10, $yBackup + 40); $backupProgressBar.Size = New-Object System.Drawing.Size(405, 20); $backupGroupBox.Controls.Add($backupProgressBar)
-
-# CORRECTED: Set AutoSize to true for the status label
-$backupStatusLabel = New-Object System.Windows.Forms.Label
-$backupStatusLabel.Location = [System.Drawing.Point]::new(10, $yBackup + 65)
-$backupStatusLabel.AutoSize = $true #<-- This allows the label to set its own height
-$backupStatusLabel.Text = "Select items and destination."
-$backupGroupBox.Controls.Add($backupStatusLabel)
+$backupStatusLabel = New-Object System.Windows.Forms.Label; $backupStatusLabel.Location = [System.Drawing.Point]::new(10, $yBackup + 65); $backupStatusLabel.AutoSize = $true; $backupStatusLabel.Text = "Select items and destination."; $backupGroupBox.Controls.Add($backupStatusLabel)
 
 #==================================================================
 # GroupBox for Restore
 #==================================================================
 $restoreGroupBox = New-Object System.Windows.Forms.GroupBox
-$restoreGroupBox.Location = [System.Drawing.Point]::new(10, 310)
-$restoreGroupBox.Size = New-Object System.Drawing.Size(435, 290)
+$restoreGroupBox.Location = [System.Drawing.Point]::new(10, 330) #<-- Adjusted Y
+$restoreGroupBox.Size = New-Object System.Drawing.Size(425, 310) #<-- Adjusted height
 $restoreGroupBox.Text = "Restore"
 $tabBackup.Controls.Add($restoreGroupBox)
 
@@ -69,26 +67,26 @@ $selectAllRestoreCheckbox = New-Object System.Windows.Forms.CheckBox; $selectAll
 $itemIndex = 0
 foreach ($item in $backupRestoreItems) {
     $xPos = 0; $yPos = 0
-    if ($itemIndex -lt $itemsInFirstColumn) { $xPos = 40; $yPos = $yRestore + ($itemIndex * 20) } else { $xPos = 220; $yPos = $yRestore + (($itemIndex - $itemsInFirstColumn) * 20) }
+    if ($itemIndex -lt $itemsInFirstColumn) {
+        $xPos = 40
+        $yPos = $yRestore + ($itemIndex * 20)
+    } else {
+        $xPos = 220
+        $yPos = $yRestore + (($itemIndex - $itemsInFirstColumn) * 20)
+    }
     $checkbox = New-Object System.Windows.Forms.CheckBox; $checkbox.Location = [System.Drawing.Point]::new($xPos, $yPos); $checkbox.Size = New-Object System.Drawing.Size(180, 20); $checkbox.Text = $item
     $restoreGroupBox.Controls.Add($checkbox); $restoreCheckboxes += $checkbox; $itemIndex++
 }
 $selectAllRestoreCheckbox.Add_Click({ foreach ($cb in $restoreCheckboxes) { $cb.Checked = $selectAllRestoreCheckbox.Checked } })
 
 # --- Restore Source and Button ---
-$yRestore = 160
+$yRestore = 180 #<-- CHANGED FROM 160
 $restoreDestLabel = New-Object System.Windows.Forms.Label; $restoreDestLabel.Location = [System.Drawing.Point]::new(10, $yRestore); $restoreDestLabel.Size = New-Object System.Drawing.Size(400, 20); $restoreDestLabel.Text = "Restore From (select parent folder):"; $restoreGroupBox.Controls.Add($restoreDestLabel); $yRestore += 20
 $restorePathTextBox = New-Object System.Windows.Forms.TextBox; $restorePathTextBox.Location = [System.Drawing.Point]::new(10, $yRestore); $restorePathTextBox.Size = New-Object System.Drawing.Size(320, 20); $restorePathTextBox.ReadOnly = $true; $restoreGroupBox.Controls.Add($restorePathTextBox)
 $browseRestoreButton = New-Object System.Windows.Forms.Button; $browseRestoreButton.Location = [System.Drawing.Point]::new(340, $yRestore - 2); $browseRestoreButton.Size = New-Object System.Drawing.Size(75, 25); $browseRestoreButton.Text = "Browse..."; $restoreGroupBox.Controls.Add($browseRestoreButton); $yRestore += 30
 $restoreButton = New-Object System.Windows.Forms.Button; $restoreButton.Location = [System.Drawing.Point]::new(150, $yRestore); $restoreButton.Size = New-Object System.Drawing.Size(120, 30); $restoreButton.Text = "Start Restore"; $restoreButton.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold); $restoreGroupBox.Controls.Add($restoreButton)
 $restoreProgressBar = New-Object System.Windows.Forms.ProgressBar; $restoreProgressBar.Location = [System.Drawing.Point]::new(10, $yRestore + 40); $restoreProgressBar.Size = New-Object System.Drawing.Size(405, 20); $restoreGroupBox.Controls.Add($restoreProgressBar)
-
-# CORRECTED: Set AutoSize to true for the status label
-$restoreStatusLabel = New-Object System.Windows.Forms.Label
-$restoreStatusLabel.Location = [System.Drawing.Point]::new(10, $yRestore + 65)
-$restoreStatusLabel.AutoSize = $true #<-- This allows the label to set its own height
-$restoreStatusLabel.Text = "Select items and source."
-$restoreGroupBox.Controls.Add($restoreStatusLabel)
+$restoreStatusLabel = New-Object System.Windows.Forms.Label; $restoreStatusLabel.Location = [System.Drawing.Point]::new(10, $yRestore + 65); $restoreStatusLabel.AutoSize = $true; $restoreStatusLabel.Text = "Select items and source."; $restoreGroupBox.Controls.Add($restoreStatusLabel)
 
 #==================================================================
 # Button Click Logic

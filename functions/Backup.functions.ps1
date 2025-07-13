@@ -9,6 +9,9 @@ $allBackupTasks = @{
     "mkcerts"          = @{ Path = "$env:LOCALAPPDATA\mkcert" }
     "JDownloader"      = @{ Path = "$env:ProgramFiles\JDownloader\cfg" }
     "Input Director"   = @{ Export = { & "C:\Program Files\Input Director\IDConfig.exe" -exportconfig:"$($destinationPath)\LatestConfig.xml" }; Import = { & "C:\Program Files\Input Director\IDConfig.exe" -importconfig:"$($sourcePath)\LatestConfig.xml" }; Path = "C:\Program Files\Input Director\IDConfig.exe" }
+    "SSH Keys"         = @{ Path = "$env:USERPROFILE\.ssh" }
+    "Game Saves"       = @{ Path = "$env:USERPROFILE\Saved Games" }
+    "Public Documents" = @{ Path = "$env:PUBLIC\Documents" } # <-- ADDED THIS LINE
 }
 
 # --- Backup Function ---
@@ -53,8 +56,6 @@ function Start-AppBackup {
             if (Test-Path -Path $task.Path) {
                 $destinationPath = Join-Path -Path $backupRoot -ChildPath ($task.Path -replace ':', '')
                 New-BackupFolder $destinationPath
-                # --- THIS LINE IS CORRECTED ---
-                # Removed "| Out-Null" which was causing the silent failure.
                 robocopy $task.Path $destinationPath /E /R:2 /W:5 /NFL /NDL /NJH /NJS /nc /ns /np
             } else { $skippedItems += $taskName }
         }

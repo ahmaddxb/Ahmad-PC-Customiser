@@ -3,12 +3,12 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; iex (irm https://raw.githubuse
 
 ## Backup / restore
 
-.ssh folder
 game save folder
-
+X:\Users\Public\Documents\Steam
+X:\Users\Public\Documents\OnlineFix
+X:\Users\Public\Documents
 
 ## Tweaks
 
-My computer on desktop
 
 
