@@ -8,7 +8,7 @@
 # Make sure these match your GitHub username and repository name
 $githubUser = "ahmaddxb"
 $repoName   = "Ahmad-PC-Customiser"
-$branchName = "master" # Change this to "main" if that is your default branch
+$branchName = "master" # Change this to "main" if that is your repository's default branch
 # --- END CONFIGURATION ---
 
 # Define URLs and temporary paths
@@ -39,27 +39,25 @@ try {
     Write-Host "Project extracted to: $projectRoot"
 
     # --- SCRIPT COMBINER LOGIC ---
-    # Define the exact order in which to combine the script files.
-    # This order is critical for the script to work correctly.
-    $filesToCombine = @(
-        # Configurations must come first
+    # Define the files in logical groups to ensure correct loading order.
+    $configFiles = @(
         "config/RemoveApps.config.ps1",
         "config/WindowsTweaks.config.ps1",
-        "config/InstallApps.config.ps1",
-        # Then all functions
+        "config/InstallApps.config.ps1"
+    )
+    $functionFiles = @(
         "functions/App-Removal.functions.ps1",
         "functions/Tweak-Checks.functions.ps1",
         "functions/Backup.functions.ps1",
-        "functions/App-Install.functions.ps1",
-        # Then the main UI elements from Main.ps1 (which we will add manually below)
-        # Then the individual tabs
+        "functions/App-Install.functions.ps1"
+    )
+    $tabFiles = @(
         "tabs/Tab.RemoveApps.ps1",
         "tabs/Tab.WindowsTweaks.ps1",
         "tabs/Tab.InstallApps.ps1",
         "tabs/Tab.Backup.ps1"
     )
 
-    # Start building the final, single script string
     Write-Host "Combining script files..."
     
     # Start with the mandatory header
@@ -67,30 +65,30 @@ try {
 #----------------------------------
 #  AUTO-GENERATED SINGLE-FILE SCRIPT
 #----------------------------------
-#requires -version 5.1
-#requires -runasadministrator
-
-# The admin check is handled by the loader, so it is not needed here.
-
 Add-Type -AssemblyName System.Windows.Forms
-
 "@
 
-    # Append the content of each file in the specified order
-    foreach ($file in $filesToCombine) {
-        $filePath = Join-Path $projectRoot $file
+    # Helper function to append file content to the main script string
+    function Append-FileContent($fileRelativePath, [ref]$scriptString) {
+        $filePath = Join-Path $projectRoot $fileRelativePath
         if (Test-Path $filePath) {
-            $combinedScript += "`n# --- From File: $file ---`n"
-            $combinedScript += Get-Content -Path $filePath -Raw
+            $scriptString.Value += "`n# --- From File: $fileRelativePath ---`n"
+            $scriptString.Value += (Get-Content -Path $filePath -Raw)
         } else {
             Write-Warning "Could not find file: $filePath"
         }
     }
 
-    # Manually add the core UI creation and the final ShowDialog() call
+    # 1. Append all Configurations
+    $configFiles | ForEach-Object { Append-FileContent -fileRelativePath $_ -scriptString ([ref]$combinedScript) }
+
+    # 2. Append all Functions
+    $functionFiles | ForEach-Object { Append-FileContent -fileRelativePath $_ -scriptString ([ref]$combinedScript) }
+
+    # 3. Manually add the core UI creation code BEFORE the tabs
     $combinedScript += @"
 
-# --- Main UI Creation and Execution ---
+# --- Main UI Creation ---
 `$form = New-Object System.Windows.Forms.Form
 `$form.Text = "Ahmaddxb Windows Customiser"
 `$form.Size = New-Object System.Drawing.Size(500, 850)
@@ -101,10 +99,15 @@ Add-Type -AssemblyName System.Windows.Forms
 `$tabControl = New-Object System.Windows.Forms.TabControl
 `$tabControl.Dock = [System.Windows.Forms.DockStyle]::Fill
 `$form.Controls.Add(`$tabControl)
+"@
 
-# The individual tab scripts have already been loaded, so they will now add themselves to `$tabControl`
-# when this combined script is executed.
+    # 4. Append all Tab UI files
+    $tabFiles | ForEach-Object { Append-FileContent -fileRelativePath $_ -scriptString ([ref]$combinedScript) }
 
+    # 5. Append the final execution command
+    $combinedScript += @"
+
+# --- Show the Form ---
 `$form.ShowDialog() | Out-Null
 "@
 
