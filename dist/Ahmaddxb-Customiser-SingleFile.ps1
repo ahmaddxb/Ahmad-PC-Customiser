@@ -51,6 +51,10 @@ $windowsTweaksMapping = @{
         Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop" -Name "Mode" -Value 1 -Force
         Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop" -Name "LogicalViewMode" -Value 3 -Force
     }
+    "Set Compact Desktop Icon Spacing" = {
+        Set-ItemProperty -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "IconSpacing" -Value "-975" -Type String -Force
+        Set-ItemProperty -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "IconVerticalSpacing" -Value "-975" -Type String -Force
+    }
     "windows 11 task bar to hide search"                                  = { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -Value 0 -Force }
     "Hide Chat on Task Bar"                                               = { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarMn" -Value 0 -Force }
     "disable search web results on Windows 11"                            = {
@@ -260,6 +264,11 @@ function IsTweakApplied($tweakName) {
         "Set desktop icon size to small" {
             $iconSizeValue = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop" -Name "IconSize" -ErrorAction SilentlyContinue
             return ($iconSizeValue -eq 32)
+        }
+        "Set Compact Desktop Icon Spacing" { # <-- ADD THIS NEW CHECK
+            $iconSpacing = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "IconSpacing" -ErrorAction SilentlyContinue
+            $iconVerticalSpacing = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "IconVerticalSpacing" -ErrorAction SilentlyContinue
+            return ($iconSpacing -eq "-975") -and ($iconVerticalSpacing -eq "-975")
         }
         "windows 11 task bar to hide search" {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -ErrorAction SilentlyContinue

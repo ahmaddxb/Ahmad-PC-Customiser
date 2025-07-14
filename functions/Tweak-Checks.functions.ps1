@@ -25,6 +25,11 @@ function IsTweakApplied($tweakName) {
             $iconSizeValue = Get-ItemPropertyValue -Path "HKCU:\SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop" -Name "IconSize" -ErrorAction SilentlyContinue
             return ($iconSizeValue -eq 32)
         }
+        "Set Compact Desktop Icon Spacing" { # <-- ADD THIS NEW CHECK
+            $iconSpacing = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "IconSpacing" -ErrorAction SilentlyContinue
+            $iconVerticalSpacing = Get-ItemPropertyValue -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "IconVerticalSpacing" -ErrorAction SilentlyContinue
+            return ($iconSpacing -eq "-975") -and ($iconVerticalSpacing -eq "-975")
+        }
         "windows 11 task bar to hide search" {
             $registryValue = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -ErrorAction SilentlyContinue
             return ($registryValue -eq 0)
