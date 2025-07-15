@@ -83,6 +83,21 @@ function IsTweakApplied($tweakName) {
             $registryValue = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "IsContinuousInnovationOptedIn" -ErrorAction SilentlyContinue
             return ($registryValue -eq 1)
         }
+        "Add elevated PowerShell to the context menu" {
+            $menuKey = "Registry::HKEY_CLASSES_ROOT\Directory\shell\runas"
+            if (-not (Test-Path $menuKey)) { return $false }
+            
+            $muiverb = Get-ItemPropertyValue -Path $menuKey -Name "MUIVerb" -ErrorAction SilentlyContinue
+            $icon = Get-ItemPropertyValue -Path $menuKey -Name "Icon" -ErrorAction SilentlyContinue
+            
+            $commandKey = "$menuKey\command"
+            if (-not (Test-Path $commandKey)) { return $false }
+            $command = Get-ItemPropertyValue -Path $commandKey -Name "(default)" -ErrorAction SilentlyContinue
+            
+            return ($muiverb -eq "Open PowerShell window here (Admin)") -and
+                   ($icon -eq "powershell.exe") -and
+                   ($command -eq 'powershell.exe -NoExit -Command "Set-Location -LiteralPath \"%L\""')
+        }
         default {
             return $false
         }

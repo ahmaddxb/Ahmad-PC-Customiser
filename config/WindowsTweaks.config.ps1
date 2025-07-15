@@ -45,4 +45,20 @@ $windowsTweaksMapping = @{
     "Turn On Get me up to date for Windows Update"                        = { New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "IsExpedited" -Value "1" -Force }
     "Turn On Auto-restart Notifications for Windows Update in Settings"   = { New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "RestartNotificationsAllowed2" -Value "1" -Force }
     "Get Latest Updates as soon as available in Windows 11"               = { New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "IsContinuousInnovationOptedIn" -Value "1" -Force }
+    "Add elevated PowerShell to the context menu" = {
+        # Create registry entries for elevated PowerShell context menu
+        $menuKey = "Registry::HKEY_CLASSES_ROOT\Directory\shell\runas"
+        if (-not (Test-Path $menuKey)) {
+            New-Item -Path $menuKey -Force | Out-Null
+            Set-ItemProperty -Path $menuKey -Name "HasLUAShield" -Value "" -Type String
+            Set-ItemProperty -Path $menuKey -Name "Extended" -Value "" -Type String
+            Set-ItemProperty -Path $menuKey -Name "NoWorkingDirectory" -Value "" -Type String
+            Set-ItemProperty -Path $menuKey -Name "Icon" -Value "powershell.exe" -Type String
+            Set-ItemProperty -Path $menuKey -Name "MUIVerb" -Value "Open PowerShell window here (Admin)" -Type String
+
+            $commandKey = "$menuKey\command"
+            New-Item -Path $commandKey -Force | Out-Null
+            Set-ItemProperty -Path $commandKey -Name "(Default)" -Value 'powershell.exe -NoExit -Command "Set-Location -LiteralPath \"%L\""' -Type String
+        }
+    }
 }

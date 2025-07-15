@@ -5,7 +5,6 @@
 #>
 
 # --- SCRIPT CONFIGURATION ---
-$PSScriptRoot = Get-Location
 $OutputDirectory = Join-Path -Path $PSScriptRoot -ChildPath "dist"
 $OutputFileName = "Ahmaddxb-Customiser-SingleFile.ps1"
 $OutputFilePath = Join-Path -Path $OutputDirectory -ChildPath $OutputFileName
